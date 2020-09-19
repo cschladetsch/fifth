@@ -206,14 +206,12 @@ public class Lexer extends ProcessBase {
     }
 
     private StringSplice gatherSplice(ICharCategory cat) {
-        int length = 0;
         int startOffset = offset;
         while (cat.matches(getCurrent())) {
-            ++length;
+            ++offset;
         }
 
-        offset += length;
-        return new StringSplice(lineNumber, startOffset, length);
+        return new StringSplice(lineNumber, startOffset, offset - startOffset);
     }
 
     private StringSplice currentSplice() {

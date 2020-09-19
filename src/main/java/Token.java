@@ -11,6 +11,14 @@ public class Token {
         this.lexer = lexer;
     }
 
+    @Override
+    public String toString() {
+        return "Token{" +
+                "type=" + type +
+                "text=" + (getText().isPresent() ? getText().get() : "") +
+                '}';
+    }
+
     public Optional<String> getText() {
         return lexer.getText(splice);
     }
