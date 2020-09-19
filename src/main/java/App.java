@@ -29,7 +29,9 @@ public class App {
 
         Lexer lexer = new Lexer(logger, lines.get());
         if (!lexer.run()) {
-            logger.info(String.format("Failed to lex @%s", lexer.getLocation()));
+            logger.debug(lexer.toString());
+            logger.error("Failed to lex.");
+            return -1;
         }
 
         logger.info(lexer.toString());
@@ -41,7 +43,7 @@ public class App {
         try {
             return Optional.of(Files.readAllLines(Paths.get(fileName)));
         } catch (IOException e) {
-            logger.error(e);
+            logger.error(e.getMessage());
         }
 
         return Optional.empty();

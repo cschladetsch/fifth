@@ -47,6 +47,18 @@ public class Lexer extends ProcessBase {
 
     @Override
     public String toString() {
+        return "Lexer{" +
+                "lines=" + lines +
+                ", tokens=" + tokens +
+                ", lineNumber=" + lineNumber +
+                ", offset=" + offset +
+                ", logger=" + logger +
+                ", Process=" + super.toString() +
+                '}';
+    }
+
+    //@Override
+    public String toString2() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Lexer: ");
         String comma = "";
@@ -78,7 +90,7 @@ public class Lexer extends ProcessBase {
     }
 
     private Optional<String> badSplice(StringSplice splice) {
-        logger.error(String.format("Invalid splice %s", splice.toString()));
+        fail(String.format("Invalid splice %s", splice.toString()));
         return Optional.empty();
     }
 
@@ -117,7 +129,7 @@ public class Lexer extends ProcessBase {
             StringSplice stringSplice = gatherSplice(Character::isAlphabetic);
             Optional<String> textOpt = getText(stringSplice);
             if (!textOpt.isPresent()) {
-                logger.error("Failed to gather text @" + stringSplice);
+                fail("Failed to gather text @" + stringSplice);
                 return false;
             }
 
