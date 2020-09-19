@@ -1,4 +1,4 @@
-public class ProcessBase {
+public abstract class ProcessBase {
     protected ILogger logger;
     private Boolean failed;
     private String text;
@@ -18,6 +18,10 @@ public class ProcessBase {
         return failed;
     }
 
+    protected boolean notImplemented() {
+        return fail("Not implemented");
+    }
+
     @Override
     public String toString() {
         return "ProcessBase{" +
@@ -30,4 +34,6 @@ public class ProcessBase {
         failed = false;
         text = "";
     }
+
+    abstract boolean run();
 }

@@ -7,12 +7,13 @@ enum EAstNodeType {
     Value,
     Array,
     Continuation,
-    Comment,
+    Comment, Token,
 }
 
 public class AstNode {
     private EAstNodeType type;
     private Object value;
+    private ETokenType tokenType;
     private List<AstNode> children = new ArrayList<>();
 
     public AstNode(EAstNodeType type) {
@@ -22,6 +23,11 @@ public class AstNode {
     public AstNode(EAstNodeType type, Object value) {
         this.type = type;
         this.value = value;
+    }
+
+    public AstNode(ETokenType tokenType) {
+        this.type = EAstNodeType.Token;
+        this.tokenType = tokenType;
     }
 
     @Override
@@ -46,5 +52,9 @@ public class AstNode {
 
     public boolean hasChildren() {
         return !children.isEmpty();
+    }
+
+    public void addChild(AstNode node) {
+        children.add(node);
     }
 }

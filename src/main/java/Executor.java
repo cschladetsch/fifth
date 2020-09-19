@@ -45,6 +45,11 @@ public class Executor extends ProcessBase {
                 '}';
     }
 
+    @Override
+    boolean run() {
+        return execute(EOperation.Suspend);
+    }
+
     public void process(Continuation continuation) {
         context.push(continuation);
         execute(EOperation.Suspend);

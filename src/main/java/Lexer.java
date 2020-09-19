@@ -24,10 +24,17 @@ enum ETokenType
     Ident,
     QuotedIdent,
     Whitespace,
+
+    OpenSquareBracket,
+    CloseSquareBracket,
+
     OpenParan,
     CloseParan,
+
     OpenBrace,
     CloseBrace,
+
+    Exit,
 }
 
 interface ICharCategory {
@@ -125,20 +132,18 @@ public class Lexer extends ProcessBase {
             return addToken(ETokenType.Number, gatherSplice(Character::isDigit));
         }
 
-        if (Character.isAlphabetic(curr)) {
-            StringSplice stringSplice = gatherSplice(Character::isAlphabetic);
-            Optional<String> textOpt = getText(stringSplice);
-            if (!textOpt.isPresent()) {
-                fail("Failed to gather text @" + stringSplice);
-                return false;
-            }
-
-            String text = textOpt.get();
-            if (text.equals("assert")) {
-                return addToken(ETokenType.Assert);
-            }
+        if (processAlpha(curr)) {
+            return true;
         }
 
+        if (processOperation(curr)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private boolean processOperation(char curr) {
         switch (curr) {
             case '+': return addToken(ETokenType.Plus);
             case '-': return addToken(ETokenType.Plus);
@@ -148,6 +153,30 @@ public class Lexer extends ProcessBase {
                 }
                 return addToken(ETokenType.Store);
             }
+        }
+
+        return false;
+    }
+
+    private boolean processAlpha(char curr) {
+        if (!Character.isAlphabetic(curr)) {
+            return false;
+        }
+
+        StringSplice stringSplice = gatherSplice(Character::isAlphabetic);
+        Optional<String> textOpt = getText(stringSplice);
+        if (!textOpt.isPresent()) {
+            fail("Failed to gather text @" + stringSplice);
+            return false;
+        }
+
+        String text = textOpt.get();
+        if (text.equals("assert")) {
+            return addToken(ETokenType.Assert);
+        }
+
+        if (text.equals("exit")) {
+            return addToken(ETokenType.Exit);
         }
 
         return false;
@@ -170,6 +199,7 @@ public class Lexer extends ProcessBase {
         tokens.add(new Token(type, currentSplice(len), this));
         return true;
     }
+
     private boolean addToken(ETokenType type, StringSplice splice) {
         tokens.add(new Token(type, splice, this));
         return true;
@@ -194,9 +224,11 @@ public class Lexer extends ProcessBase {
         return new StringSplice(lineNumber, offset, len);
     }
 
-
     private char getCurrent() {
         return lines.get(lineNumber).charAt(offset);
     }
 
+    public List<Token> getTokens() {
+        return tokens;
+    }
 }
