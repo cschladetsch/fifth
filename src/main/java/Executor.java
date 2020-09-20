@@ -91,6 +91,8 @@ public class Executor extends ProcessBase {
                 return EOperation.Print;
             case Break:
                 return EOperation.Break;
+            default:
+                break;
         }
 
         return fail("Couldn't convert token " + token + " to something to do.");
@@ -112,6 +114,8 @@ public class Executor extends ProcessBase {
                 return doPrint();
             case Suspend:
                 return doSuspend();
+            default:
+                break;
         }
 
         return fail("Unsupported operation " + operation);
