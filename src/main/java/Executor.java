@@ -92,6 +92,8 @@ public class Executor extends ProcessBase {
                 return EOperation.Print;
             case Break:
                 return EOperation.Break;
+            case Dump:
+                return EOperation.Dump;
             case Not:
                 return EOperation.Not;
             case Comment:
