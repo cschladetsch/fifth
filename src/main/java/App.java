@@ -1,6 +1,7 @@
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,8 +12,7 @@ public class App {
         try {
             System.exit(new App().run(argv));
         } catch (Exception e) {
-            System.err.println(e);
-            System.out.println(e.getStackTrace());
+            System.out.println(Arrays.toString(e.getStackTrace()));
             System.exit(-1);
         }
     }
@@ -29,13 +29,24 @@ public class App {
         }
 
         Lexer lexer = new Lexer(logger, lines.get());
-        if (!lexer.run()) {
+        if (!lexer.run() || lexer.hasFailed()) {
             logger.debug(lexer.toString());
             logger.error("Failed to lex.");
             return -1;
         }
 
+        Parser parser = new Parser(lexer);
+        if (!parser.run() || parser.hasFailed()) {
+            logger.debug(parser.toString());
+            logger.error("Failed to parse.");
+            return -1;
+        }
+
+
         logger.info(lexer.toString());
+        logger.info("");
+        logger.info(parser.toString());
+        logger.info("");
 
         return 0;
     }

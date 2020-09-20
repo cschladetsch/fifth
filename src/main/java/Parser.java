@@ -1,69 +1,96 @@
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Stack;
 
 public class Parser extends ProcessBase {
     private Lexer lexer;
-    private final List<AstNode> tree = new ArrayList<>();
+    private final Stack<AstNode> stack = new Stack<>();
     private AstNode current;
 
     public Parser(Lexer lexer) {
         super(lexer.logger);
+        this.lexer = lexer;
+        this.current = enterNode(EAstNodeType.Continuation);
+    }
+
+    @Override
+    public String toString() {
+        return "Parser{" +
+                "stack=" + stack +
+                ", current=" + current +
+                '}';
     }
 
     public boolean run() {
         for (Token token : lexer.getTokens()) {
-            switch (token.getType()) {
-                case Number:
-                    if (!addNumber(token))
-                        return false;
-                    break;
-                case Plus:
-                case Equiv:
-                case Assert:
-                    addNode(token.getType());
-                    break;
-                case OpenParan:
-                case OpenBrace:
-                case OpenSquareBracket:
-                    return fail("Not implemented");
-                default:
-                    throw new IllegalStateException("Unexpected value: " + token.getType());
+            if (!parseToken(token)) {
+                break;
             }
         }
 
+        return !hasFailed();
+    }
+
+    private boolean parseToken(Token token) {
+        switch (token.getType()) {
+            case Number:
+                return addNumber(token);
+            case Plus:
+            case Equiv:
+            case Assert:
+                return addToken(token.getType());
+            case OpenParan:
+            case OpenBrace:
+            case OpenSquareBracket:
+            case CloseParan:
+            case CloseBrace:
+            case CloseSquareBracket:
+                return notImplemented();
+            case Whitespace:
+                return true;
+            default:
+                throw new IllegalStateException("Unexpected value: " + token.getType());
+        }
+    }
+
+    private boolean addToken(ETokenType tokenType) {
+        return addChild(new AstNode(tokenType));
+    }
+
+    private boolean addChild(EAstNodeType type, Object val) {
+        return addChild(new AstNode(type, val));
+    }
+
+    private boolean addChild(AstNode child) {
+        current.addChild(child);
         return true;
-    }
-
-    private void addNode(ETokenType tokenType) {
-        current = new AstNode(tokenType);
-        tree.add(current);
-    }
-
-    private void addNode(EAstNodeType type, int val) {
-        current = new AstNode(type, val);
-        tree.add(current);
     }
 
     private boolean addNumber(Token token) {
         try {
             int val = Integer.parseInt(token.getText().get());
-            addNode(EAstNodeType.Value, val);
+            return addChild(EAstNodeType.Value, val);
         } catch (Exception e) {
             fail("Failed to convert " + token.getText() + " to a number.");
         }
 
-        return true;
+        return false;
     }
 
-    private void addChildNode(EAstNodeType type, int val) {
-        current.addChild(new AstNode(type, val));
+    private AstNode enterNode(EAstNodeType type) {
+        AstNode node = new AstNode(type);
+        stack.push(node);
+        return node;
     }
 
-    private void leaveChild() {
-        current = tree.get(tree.size() - 1);
+    private AstNode leaveNode() {
+        return current = stack.pop();
     }
 
     public AstNode getRoot() {
-        return tree.get(0);
+        if (stack.size() != 1) {
+            fail("Unbalanced parser stack.");
+            return null;
+        }
+
+        return stack.peek();
     }
 }

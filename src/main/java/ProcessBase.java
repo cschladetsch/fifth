@@ -1,7 +1,7 @@
 public abstract class ProcessBase {
-    protected ILogger logger;
-    private Boolean failed;
-    private String text;
+    protected ILogger logger = null;
+    private boolean failed = false;
+    private String text = "";
 
     protected ProcessBase(ILogger logger) {
         this.logger = logger;
@@ -19,7 +19,11 @@ public abstract class ProcessBase {
     }
 
     protected boolean notImplemented() {
-        return fail("Not implemented");
+        return notImplemented();
+    }
+
+    protected boolean notImplemented(String what) {
+        return fail("Not implemented " + what);
     }
 
     @Override

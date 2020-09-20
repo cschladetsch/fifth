@@ -43,7 +43,7 @@ public class AstNode {
     }
 
     public Object getValue() {
-        return value;
+        return type == EAstNodeType.Token ? tokenType : value;
     }
 
     public List<AstNode> getChildren() {

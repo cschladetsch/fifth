@@ -14,26 +14,38 @@ public class Translator extends ProcessBase {
     @Override
     public boolean run() {
         AstNode node = parser.getRoot();
-        while (node != null) {
-            switch (node.getType()) {
-                case Token:
-                case Operation:
-                case Value:
-                    code.add(node.getValue());
-                    break;
-                case None:
-                    break;
-                case Array:
-                case Continuation:
-                case Comment:
-                    notImplemented();
-                    break;
-                default:
-                    fail("Unhandled node " + node);
-                    return false;
+        continuation = translateContinuation(node);
+        return !hasFailed();
+    }
+
+    private Continuation translateContinuation(AstNode node) {
+        Continuation continuation = new Continuation(translateChildren(node));
+        return continuation;
+    }
+
+    private List<Object> translateChildren(AstNode node) {
+        List<Object> code = new ArrayList<>();
+        for (AstNode child : node.getChildren()) {
+            code.add(translate(child));
+            if (hasFailed()) {
+                break;
             }
         }
 
-        return true;
+        return code;
+    }
+
+    private Object translate(AstNode node) {
+        switch (node.getType()) {
+            case Operation:
+            case Value:
+            case Token:
+                return node.getValue();
+            case Continuation:
+                return translateContinuation(node);
+            default:
+                notImplemented(node.toString());
+                return null;
+        }
     }
 }

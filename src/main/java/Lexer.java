@@ -1,6 +1,4 @@
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static java.lang.Integer.min;
 
@@ -46,10 +44,13 @@ public class Lexer extends ProcessBase {
     private final List<Token> tokens = new ArrayList<>();
     private int lineNumber;
     private int offset;
+    private final Map<String, ETokenType> tokenNames = new HashMap<String,ETokenType>();
 
     public Lexer(ILogger logger, List<String> lines) {
         super(logger);
         this.lines = lines;
+        tokenNames.put("assert", ETokenType.Assert);
+        tokenNames.put("exit", ETokenType.Exit);
     }
 
     @Override
@@ -96,7 +97,7 @@ public class Lexer extends ProcessBase {
     }
 
     private Optional<String> badSplice(StringSplice splice) {
-        fail(String.format("Invalid splice %s", splice.toString()));
+        fail("Invalid splice " + splice);
         return Optional.empty();
     }
 
@@ -107,17 +108,17 @@ public class Lexer extends ProcessBase {
     public boolean run() {
         for (String line : lines) {
             if (!parseLine(line)) {
-                return false;
+                break;
             }
 
             if (hasFailed()) {
-                return false;
+                break;
             }
 
             ++lineNumber;
         }
 
-        return true;
+        return !hasFailed();
     }
 
     private boolean parseLine(String line) {
@@ -161,8 +162,8 @@ public class Lexer extends ProcessBase {
         return fail("Cannot parse " + getCurrent() + " at line:" + lineNumber + ": " + offset);
     }
 
-    private boolean processOperation(char curr) {
-        switch (curr) {
+    private boolean processOperation(char ch) {
+        switch (ch) {
             case '+': return addToken(ETokenType.Plus, 1);
             case '-': return addToken(ETokenType.Minus, 1);
             case '=': {
@@ -171,6 +172,9 @@ public class Lexer extends ProcessBase {
                 }
                 return addToken(ETokenType.Store, 1);
             }
+            default:
+                fail("Unrecognised operator starting with '" + ch + "'");
+                break;
         }
 
         return false;
@@ -184,20 +188,15 @@ public class Lexer extends ProcessBase {
         StringSplice stringSplice = gatherSplice(Character::isAlphabetic);
         Optional<String> textOpt = getText(stringSplice);
         if (!textOpt.isPresent()) {
-            fail("Failed to gather text @" + stringSplice);
-            return false;
+            return fail("Failed to gather text @" + stringSplice);
         }
 
         String text = textOpt.get();
-        if (text.equals("assert")) {
-            return addToken(ETokenType.Assert, stringSplice);
+        if (!tokenNames.containsKey(text)) {
+            return false;
         }
 
-        if (text.equals("exit")) {
-            return addToken(ETokenType.Exit, stringSplice);
-        }
-
-        return false;
+        return addToken(tokenNames.get(text), stringSplice);
     }
 
     private boolean peek(char ch) {
@@ -209,13 +208,11 @@ public class Lexer extends ProcessBase {
     }
 
     private boolean addToken(ETokenType type, int len) {
-        addToken(new Token(type, currentSplice(len), this));
-        return true;
+        return addToken(new Token(type, currentSplice(len), this));
     }
 
     private boolean addToken(ETokenType type, StringSplice splice) {
-        addToken(new Token(type, splice, this));
-        return true;
+        return addToken(new Token(type, splice, this));
     }
 
     private boolean addToken(Token token)
