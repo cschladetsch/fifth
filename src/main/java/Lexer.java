@@ -3,6 +3,7 @@ import java.util.*;
 enum ETokenType
 {
     None,
+    Not,
     Number,
     String,
     Plus,
@@ -76,6 +77,7 @@ public class Lexer extends ProcessBase {
         tokenNames.put("dup", ETokenType.Dup);
         tokenNames.put("print", ETokenType.Print);
         tokenNames.put("dump", ETokenType.Dump);
+        tokenNames.put("not", ETokenType.Not);
     }
 
     @Override

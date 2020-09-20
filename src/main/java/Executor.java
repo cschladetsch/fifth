@@ -24,7 +24,7 @@ enum EOperation {
     Store,
     Get,
     Exists,
-    Duplicate, Dump, Multiply,
+    Duplicate, Dump, Multiply, Not,
 }
 
 public class Executor extends ProcessBase {
@@ -92,6 +92,8 @@ public class Executor extends ProcessBase {
                 return EOperation.Print;
             case Break:
                 return EOperation.Break;
+            case Not:
+                return EOperation.Not;
             case Comment:
                 return true;
             default:
@@ -118,6 +120,8 @@ public class Executor extends ProcessBase {
                 return doPrint();
             case Suspend:
                 return doSuspend();
+            case Not:
+                return doNot();
             case Dump:
                 logger.debug(this.toString());
             default:
@@ -125,6 +129,28 @@ public class Executor extends ProcessBase {
         }
 
         return fail("Unsupported operation " + operation);
+    }
+
+    private boolean doNot() {
+        Object obj = dataPop();
+        if (obj.getClass() == Boolean.class) {
+            return !(boolean)obj;
+        }
+
+        if (obj.getClass() == Integer.class) {
+            return (int)obj != 0;
+        }
+
+        if (obj.getClass() == Float.class) {
+            return Math.abs((float)obj) > FLOAT_EPSLION;
+        }
+
+        if (obj.getClass() == String.class) {
+            String str = (String)obj;
+            return str.isEmpty() || str.length() == 0; // why do I hate this
+        }
+
+        return notImplemented("Cannot negate type " + obj.getClass().getSimpleName());
     }
 
     private boolean doPrint() {
