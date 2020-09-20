@@ -18,14 +18,10 @@ public class App {
         }
     }
 
-    private int run(String[] argv) {
-        logger = new Logger();
-        logger.info("Fifth-lang Repl");
-
-        String inputFilename = argv[0];
-        Optional<List<String>> lines = fileContents(inputFilename);
+    private int run(String fileName) {
+        Optional<List<String>> lines = fileContents(fileName);
         if (!lines.isPresent()) {
-            logger.error("Failed to read " + inputFilename);
+            logger.error("Failed to read " + fileName);
             return -1;
         }
 
@@ -59,15 +55,50 @@ public class App {
         }
 
 //        logger.info(lexer.toString());
-//        logger.info("");
 //        logger.info(parser.toString());
-//        logger.info("");
-        logger.info(translator.toString());
-        logger.info("");
+//        logger.info(translator.toString());
 //        logger.info(executor.toString());
-//        logger.info("");
 
         return 0;
+    }
+
+    private int run(String[] argv) {
+        logger = new Logger();
+        logger.info("Fifth-lang Repl");
+
+        if (argv.length > 0) {
+            return run(argv[0]);
+        }
+
+        Executor executor = new Executor(logger);
+        while (true) {
+            System.out.print("λ ");
+            String text = System.console().readLine();
+
+            Lexer lexer = new Lexer(logger, text);
+            if (!lexer.run()) {
+                continue;
+            }
+
+            Parser parser = new Parser(lexer);
+            if (!parser.run()) {
+                continue;
+            }
+
+            Translator translator = new Translator(parser);
+            if (!translator.run()) {
+                continue;
+            }
+
+            if (!executor.run(translator.getContinuation())) {
+                continue;
+            }
+
+            int n = 0;
+            for (Object obj : executor.getDataStack()) {
+                System.out.println(String.format("[%n]: %s", n++, obj.toString()));
+            }
+        }
     }
 
     private Optional<List<String>> fileContents(String fileName) {

@@ -52,9 +52,9 @@ public class Executor extends ProcessBase {
         return execute(EOperation.Suspend);
     }
 
-    public void run(Continuation continuation) {
+    public boolean run(Continuation continuation) {
         context.push(continuation);
-        execute(EOperation.Suspend);
+        return execute(EOperation.Suspend);
     }
 
     private boolean execute(Object object) {
@@ -292,5 +292,9 @@ public class Executor extends ProcessBase {
         }
 
         return true;
+    }
+
+    public Stack<Object> getDataStack() {
+        return data;
     }
 }

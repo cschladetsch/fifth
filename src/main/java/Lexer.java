@@ -53,6 +53,16 @@ public class Lexer extends ProcessBase {
     private int offset;
     private final Map<String, ETokenType> tokenNames = new HashMap<String,ETokenType>();
 
+    public Lexer(ILogger logger, String line) {
+        this(logger, makeLines(line));
+    }
+
+    private static List<String> makeLines(String line) {
+        List<String> lines = new ArrayList<>();
+        lines.add(line);
+        return lines;
+    }
+
     public Lexer(ILogger logger, List<String> lines) {
         super(logger);
         this.lines = lines;
