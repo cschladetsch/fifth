@@ -261,11 +261,11 @@ public class Executor extends ProcessBase {
         switch (operation) {
             case Assert: {
                 if (!trueEval(dataPop())) {
-                    fail("FAILED.");
+                    fail("FAILED");
                     return false;
                 }
 
-                logger.debug("PASSED.");
+                logger.debug("PASSED");
                 return true;
             }
 
