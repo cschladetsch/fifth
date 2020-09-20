@@ -7,6 +7,8 @@ enum ETokenType
     String,
     Plus,
     Minus,
+    Multiply,
+    Divide,
     Equiv,
     NotEquiv,
     Assert,
@@ -37,7 +39,7 @@ enum ETokenType
     CloseBrace,
 
     Break,
-    Exit, Dump,
+    Exit, Dump, Modulo, Comment,
 }
 
 interface ICharCategory {
@@ -187,6 +189,10 @@ public class Lexer extends ProcessBase {
 
     private boolean processOperation(char ch) {
         switch (ch) {
+            case '#': return addComment();
+            case '%': return addToken(ETokenType.Modulo, 1);
+            case '*': return addToken(ETokenType.Multiply, 1);
+            case '/': return addToken(ETokenType.Divide, 1);
             case '+': return addToken(ETokenType.Plus, 1);
             case '-': return addToken(ETokenType.Minus, 1);
             case '=': {
@@ -201,6 +207,16 @@ public class Lexer extends ProcessBase {
         }
 
         return false;
+    }
+
+    private boolean addComment() {
+        int length = 0;
+        int lineLength = lines.get(lineNumber).length();
+        while (length < lineLength) {
+            ++length;
+        }
+
+        return addToken(ETokenType.Comment, length);
     }
 
     private boolean processAlpha(char curr) {

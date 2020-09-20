@@ -107,7 +107,6 @@ public class App {
                 System.out.println(String.format("[%n]: %s", n++, obj.toString()));
             }
         }
-
     }
 
     private Optional<List<String>> fileContents(String fileName) {

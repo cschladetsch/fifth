@@ -24,7 +24,7 @@ enum EOperation {
     Store,
     Get,
     Exists,
-    Duplicate, Dump,
+    Duplicate, Dump, Multiply,
 }
 
 public class Executor extends ProcessBase {
@@ -92,6 +92,8 @@ public class Executor extends ProcessBase {
                 return EOperation.Print;
             case Break:
                 return EOperation.Break;
+            case Comment:
+                return true;
             default:
                 break;
         }
@@ -102,11 +104,10 @@ public class Executor extends ProcessBase {
     private boolean executeOperation(EOperation operation) {
         switch (operation) {
             case Plus:
-                return doBinaryOp(EOperation.Plus);
             case Minus:
-                return doBinaryOp(EOperation.Minus);
+            case Multiply:
             case Equiv:
-                return doBinaryOp(EOperation.Equiv);
+                return doBinaryOp(operation);
             case Assert:
                 return doUnaryOp(EOperation.Assert);
             case Break:
@@ -197,11 +198,17 @@ public class Executor extends ProcessBase {
                 return neitherNull(first, second) && doPlus(first, second);
             case Minus:
                 return neitherNull(first, second) && doMinus(first, second);
+            case Multiply:
+                return neitherNull(first, second) && doMultiply(first, second);
             case Equiv:
                 return doEquiv(first, second);
             default:
                 return notImplemented();
         }
+    }
+
+    private boolean doMultiply(Object first, Object second) {
+        return notImplemented("Multiply");
     }
 
     private boolean doEquiv(Object first, Object second) {

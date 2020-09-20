@@ -41,6 +41,7 @@ public class Parser extends ProcessBase {
             case Dup:
             case Print:
             case Dump:
+            case Comment:
                 return addToken(token.getType());
             case OpenParan:
             case OpenBrace:
