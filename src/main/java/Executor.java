@@ -57,16 +57,42 @@ public class Executor extends ProcessBase {
         execute(EOperation.Suspend);
     }
 
-    private Boolean execute(Object object) {
+    private boolean execute(Object object) {
+        if (object == null) {
+            return fail("Unexpected null");
+        }
+
         if (object.getClass() == EOperation.class) {
             return executeOperation((EOperation) object);
         }
 
-        data.push(object);
-        return true;
+        if (object.getClass() == ETokenType.class) {
+            return execute(convertToken((ETokenType)object));
+        }
+
+        return dataPush(object);
     }
 
-    private Boolean executeOperation(EOperation operation) {
+    private Object convertToken(ETokenType token) {
+        switch (token) {
+            case Plus:
+                return EOperation.Plus;
+            case Minus:
+                return EOperation.Minus;
+            case Equiv:
+                return EOperation.Equiv;
+            case NotEquiv:
+                return EOperation.NotEquiv;
+            case Assert:
+                return EOperation.Assert;
+            case Break:
+                return EOperation.Break;
+        }
+
+        return fail("Couldn't convert token " + token + " to something to do.");
+    }
+
+    private boolean executeOperation(EOperation operation) {
         switch (operation) {
             case Plus:
                 return doBinaryOp(EOperation.Plus);
@@ -74,6 +100,8 @@ public class Executor extends ProcessBase {
                 return doBinaryOp(EOperation.Equiv);
             case Assert:
                 return doUnaryOp(EOperation.Assert);
+            case Break:
+                return breakFlow = true;
             case Suspend:
                 return doSuspend();
         }
@@ -91,7 +119,22 @@ public class Executor extends ProcessBase {
         context.push(current);
         prev.ifPresent(context::push);
 
+        process(current);
+
         return true;
+    }
+
+    private void process(Continuation current) {
+        for (Object next : current.getCode()) {
+            if (!execute(next) || hasFailed()) {
+                return;
+            }
+
+            if (breakFlow) {
+                breakFlow = false;
+                break;
+            }
+        }
     }
 
     public void contextPush(Continuation continuation) {
@@ -111,9 +154,9 @@ public class Executor extends ProcessBase {
 
         switch (operation) {
             case Plus:
-                return notNull(first, second) && doPlus(first, second);
+                return neitherNull(first, second) && doPlus(first, second);
             case Minus:
-                return notNull(first, second) && doMinus(first, second);
+                return neitherNull(first, second) && doMinus(first, second);
             case Equiv:
                 return doEquiv(first, second);
             default:
@@ -134,10 +177,10 @@ public class Executor extends ProcessBase {
             return Math.abs((float)first - (float)second) > FLOAT_EPSLION;
         }
 
-        return first.equals(second);
+        return dataPush(first.equals(second));
     }
 
-    private boolean notNull(Object first, Object second) {
+    private boolean neitherNull(Object first, Object second) {
         if (first == null || second == null) {
             return fail("Unexpected null value");
         }
@@ -146,21 +189,23 @@ public class Executor extends ProcessBase {
     }
 
     private boolean doMinus(Object first, Object second) {
-        return notImplemented("Minus");
+        if (first.getClass() == Integer.class) {
+            return dataPush((int) first - (int) second);
+        }
+
+        return notImplemented(first.getClass().getName() + " - " + second.getClass().getName());
     }
 
     private boolean doPlus(Object first, Object second) {
         if (first.getClass() == Integer.class) {
-            data.push((int)first + (int)second);
-            return true;
+            return dataPush((int) first + (int) second);
         }
 
         if (first.getClass() == String.class) {
-            data.push((String)first + (String)second);
-            return true;
+            return dataPush((String)first + (String)second);
         }
 
-        return fail("Not implemented: " + first.getClass().getName() + " + " + second.getClass().getName());
+        return notImplemented(first.getClass().getName() + " + " + second.getClass().getName());
     }
 
     private Object dataPop() {
@@ -179,14 +224,23 @@ public class Executor extends ProcessBase {
                     fail("Assertion failed.");
                     return false;
                 }
+
+                return true;
             }
 
             case Print: {
                 logger.info(dataPop().toString());
                 return true;
             }
+
+            default:
+                return notImplemented(operation.toString());
         }
-        return false;
+    }
+
+    private boolean dataPush(Object object) {
+        data.push(object);
+        return true;
     }
 
     private boolean trueEval(Object object) {

@@ -32,6 +32,7 @@ enum ETokenType
     OpenBrace,
     CloseBrace,
 
+    Break,
     Exit,
 }
 
@@ -51,6 +52,7 @@ public class Lexer extends ProcessBase {
         this.lines = lines;
         tokenNames.put("assert", ETokenType.Assert);
         tokenNames.put("exit", ETokenType.Exit);
+        tokenNames.put("break", ETokenType.Break);
     }
 
     @Override
