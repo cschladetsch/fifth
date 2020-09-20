@@ -23,6 +23,12 @@ enum ETokenType
     QuotedIdent,
     Whitespace,
 
+    Dup,
+    Swap,
+    Rot,
+    RotN,
+    Drop,
+
     OpenSquareBracket,
     CloseSquareBracket,
 
@@ -53,6 +59,8 @@ public class Lexer extends ProcessBase {
         tokenNames.put("assert", ETokenType.Assert);
         tokenNames.put("exit", ETokenType.Exit);
         tokenNames.put("break", ETokenType.Break);
+        tokenNames.put("dup", ETokenType.Dup);
+        tokenNames.put("print", ETokenType.Print);
     }
 
     @Override

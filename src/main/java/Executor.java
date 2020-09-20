@@ -23,7 +23,7 @@ enum EOperation {
 
     Store,
     Get,
-    Exists,
+    Exists, Duplicate,
 }
 
 public class Executor extends ProcessBase {
@@ -85,6 +85,10 @@ public class Executor extends ProcessBase {
                 return EOperation.NotEquiv;
             case Assert:
                 return EOperation.Assert;
+            case Dup:
+                return EOperation.Duplicate;
+            case Print:
+                return EOperation.Print;
             case Break:
                 return EOperation.Break;
         }
@@ -102,11 +106,38 @@ public class Executor extends ProcessBase {
                 return doUnaryOp(EOperation.Assert);
             case Break:
                 return breakFlow = true;
+            case Duplicate:
+                return doDuplicate();
+            case Print:
+                return doPrint();
             case Suspend:
                 return doSuspend();
         }
 
         return fail("Unsupported operation " + operation);
+    }
+
+    private boolean doPrint() {
+        Object obj = dataPop();
+        logger.info(obj.getClass().getName() + "=" + obj.toString());
+        return true;
+    }
+
+    private boolean doDuplicate() {
+        Object orig = data.peek();
+        if (orig.getClass() == Integer.class) {
+            return dataPush((int)orig);
+        }
+
+        if (orig.getClass() == Float.class) {
+            return dataPush((float)orig);
+        }
+
+        if (orig.getClass() == String.class) {
+            return dataPush((String)orig);
+        }
+
+        return notImplemented("Duplicate " + orig.getClass().getName());
     }
 
     private boolean doSuspend() {

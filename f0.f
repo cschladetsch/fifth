@@ -1,2 +1,2 @@
-1 2 + 3 == assert
+1 2 + dup print 3 == assert
 
