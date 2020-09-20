@@ -146,20 +146,20 @@ public class Executor extends ProcessBase {
     private boolean doNot() {
         Object obj = dataPop();
         if (obj.getClass() == Boolean.class) {
-            return !(boolean)obj;
+            return dataPush(!(boolean)obj);
         }
 
         if (obj.getClass() == Integer.class) {
-            return (int)obj != 0;
+            return dataPush((int)obj != 0);
         }
 
         if (obj.getClass() == Float.class) {
-            return Math.abs((float)obj) > FLOAT_EPSLION;
+            return dataPush(Math.abs((float)obj) > FLOAT_EPSLION);
         }
 
         if (obj.getClass() == String.class) {
             String str = (String)obj;
-            return str.isEmpty() || str.length() == 0; // why do I hate this
+            return dataPush(str.isEmpty() || str.length() == 0); // why do I hate this
         }
 
         return notImplemented("Cannot negate type " + obj.getClass().getSimpleName());
