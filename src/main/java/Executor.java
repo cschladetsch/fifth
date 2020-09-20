@@ -102,6 +102,8 @@ public class Executor extends ProcessBase {
         switch (operation) {
             case Plus:
                 return doBinaryOp(EOperation.Plus);
+            case Minus:
+                return doBinaryOp(EOperation.Minus);
             case Equiv:
                 return doBinaryOp(EOperation.Equiv);
             case Assert:
@@ -260,6 +262,7 @@ public class Executor extends ProcessBase {
                     return false;
                 }
 
+                logger.debug("Assert passed");
                 return true;
             }
 

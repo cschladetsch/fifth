@@ -34,6 +34,7 @@ public class Parser extends ProcessBase {
             case Number:
                 return addNumber(token);
             case Plus:
+            case Minus:
             case Equiv:
             case Assert:
             case Break:

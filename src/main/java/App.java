@@ -65,10 +65,19 @@ public class App {
         logger = new Logger();
         logger.info("Fifth-lang Repl");
 
-        if (argv.length > 0) {
-            return run(argv[0]);
+        for (String fileName : argv) {
+            if (run(fileName) != 0) {
+                return -1;
+            }
         }
 
+        //Repl();
+
+        return 0;
+    }
+
+    private void Repl()
+    {
         Executor executor = new Executor(logger);
         while (true) {
             System.out.print("λ ");
@@ -98,6 +107,7 @@ public class App {
                 System.out.println(String.format("[%n]: %s", n++, obj.toString()));
             }
         }
+
     }
 
     private Optional<List<String>> fileContents(String fileName) {
