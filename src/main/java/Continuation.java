@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class Continuation {
     private List<Object> code = new ArrayList<>();
-    private final Map<String, Object> scope = new HashMap<String, Object>();
+    private final Map<String, Object> scope = new HashMap<>();
     private int current = 0;
 
     public Continuation() {
@@ -29,14 +29,6 @@ public class Continuation {
 
     public Map<String, Object> getScope() {
         return scope;
-    }
-
-    public Object next() {
-        if (current == code.size()) {
-            return null;
-        }
-
-        return code.get(++current);
     }
 
     public Boolean hasLocal(String name) {

@@ -7,7 +7,8 @@ enum EAstNodeType {
     Value,
     Array,
     Continuation,
-    Comment, Token,
+    Comment,
+    Token,
 }
 
 public class AstNode {

@@ -12,7 +12,7 @@ public class Logger implements ILogger {
         print(System.out, "debug", text);
     }
 
-    public void warning(String text) {
+    public void warn(String text) {
         print(System.out, "warn", text);
     }
 

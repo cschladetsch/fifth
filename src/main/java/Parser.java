@@ -1,7 +1,7 @@
 import java.util.Stack;
 
 public class Parser extends ProcessBase {
-    private Lexer lexer;
+    private final Lexer lexer;
     private final Stack<AstNode> stack = new Stack<>();
     private AstNode current;
 
@@ -40,6 +40,7 @@ public class Parser extends ProcessBase {
             case Break:
             case Dup:
             case Print:
+            case Dump:
                 return addToken(token.getType());
             case OpenParan:
             case OpenBrace:

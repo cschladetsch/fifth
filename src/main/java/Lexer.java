@@ -1,12 +1,10 @@
 import java.util.*;
 
-import static java.lang.Integer.min;
-
 enum ETokenType
 {
     None,
     Number,
-    //String,
+    String,
     Plus,
     Minus,
     Equiv,
@@ -39,7 +37,7 @@ enum ETokenType
     CloseBrace,
 
     Break,
-    Exit,
+    Exit, Dump,
 }
 
 interface ICharCategory {
@@ -66,11 +64,16 @@ public class Lexer extends ProcessBase {
     public Lexer(ILogger logger, List<String> lines) {
         super(logger);
         this.lines = lines;
+        addKeywords();
+    }
+
+    private void addKeywords() {
         tokenNames.put("assert", ETokenType.Assert);
         tokenNames.put("exit", ETokenType.Exit);
         tokenNames.put("break", ETokenType.Break);
         tokenNames.put("dup", ETokenType.Dup);
         tokenNames.put("print", ETokenType.Print);
+        tokenNames.put("dump", ETokenType.Dump);
     }
 
     @Override

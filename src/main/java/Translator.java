@@ -1,10 +1,9 @@
-import java.util.ArrayList;
 import java.util.List;
+import java.util.ArrayList;
 
 public class Translator extends ProcessBase {
     private final Parser parser;
     private Continuation continuation = new Continuation();
-    private List<Object> code = new ArrayList<Object>();
 
     public Translator(Parser parser) {
         super(parser.logger);
@@ -13,8 +12,7 @@ public class Translator extends ProcessBase {
 
     @Override
     public boolean run() {
-        AstNode node = parser.getRoot();
-        continuation = translateContinuation(node);
+        continuation = translateContinuation(parser.getRoot());
         return !hasFailed();
     }
 
@@ -26,8 +24,7 @@ public class Translator extends ProcessBase {
     }
 
     private Continuation translateContinuation(AstNode node) {
-        Continuation continuation = new Continuation(translateChildren(node));
-        return continuation;
+        return new Continuation(translateChildren(node));
     }
 
     private List<Object> translateChildren(AstNode node) {

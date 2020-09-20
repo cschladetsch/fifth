@@ -7,6 +7,14 @@ public abstract class ProcessBase {
         this.logger = logger;
     }
 
+    @Override
+    public String toString() {
+        return "ProcessBase{" +
+                "failed=" + failed +
+                ", text='" + text + '\'' +
+                '}';
+    }
+
     protected Boolean fail(String text) {
         failed = true;
         this.text = text;
@@ -19,19 +27,11 @@ public abstract class ProcessBase {
     }
 
     protected boolean notImplemented() {
-        return notImplemented();
+        return notImplemented("");
     }
 
     protected boolean notImplemented(String what) {
         return fail("Not implemented " + what);
-    }
-
-    @Override
-    public String toString() {
-        return "ProcessBase{" +
-                "failed=" + failed +
-                ", text='" + text + '\'' +
-                '}';
     }
 
     public void reset() {

@@ -23,7 +23,8 @@ enum EOperation {
 
     Store,
     Get,
-    Exists, Duplicate,
+    Exists,
+    Duplicate, Dump,
 }
 
 public class Executor extends ProcessBase {
@@ -116,6 +117,8 @@ public class Executor extends ProcessBase {
                 return doPrint();
             case Suspend:
                 return doSuspend();
+            case Dump:
+                logger.debug(this.toString());
             default:
                 break;
         }
@@ -125,7 +128,7 @@ public class Executor extends ProcessBase {
 
     private boolean doPrint() {
         Object obj = dataPop();
-        logger.info(obj.getClass().getName() + "=" + obj.toString());
+        logger.info(obj.getClass().getSimpleName() + "=" + obj.toString());
         return true;
     }
 
@@ -242,7 +245,7 @@ public class Executor extends ProcessBase {
             return dataPush((String)first + (String)second);
         }
 
-        return notImplemented(first.getClass().getName() + " + " + second.getClass().getName());
+        return notImplemented(first.getClass().getTypeName() + " + " + second.getClass().getName());
     }
 
     private Object dataPop() {
@@ -258,11 +261,11 @@ public class Executor extends ProcessBase {
         switch (operation) {
             case Assert: {
                 if (!trueEval(dataPop())) {
-                    fail("Assertion failed.");
+                    fail("FAILED.");
                     return false;
                 }
 
-                logger.debug("Assert passed");
+                logger.debug("PASSED.");
                 return true;
             }
 
