@@ -12,6 +12,7 @@ public class App {
             System.exit(new App().run(argv));
         } catch (Exception e) {
             System.err.println(e);
+            System.out.println(e.getStackTrace());
             System.exit(-1);
         }
     }

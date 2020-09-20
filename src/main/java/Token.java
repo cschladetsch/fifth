@@ -14,8 +14,8 @@ public class Token {
     @Override
     public String toString() {
         return "Token{" +
-                "type=" + type +
-                "text=" + (getText().isPresent() ? getText().get() : "") +
+                type +
+                " '" + (getText().isPresent() ? getText().get() : "") + "'" +
                 '}';
     }
 
@@ -25,5 +25,9 @@ public class Token {
 
     public ETokenType getType() {
         return type;
+    }
+
+    public StringSplice getSplice() {
+        return splice;
     }
 }

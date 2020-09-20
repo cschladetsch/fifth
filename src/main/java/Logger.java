@@ -2,8 +2,6 @@ import java.io.PrintStream;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.Temporal;
-import java.time.temporal.TemporalAmount;
 
 public class Logger implements ILogger {
     //private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
@@ -31,7 +29,7 @@ public class Logger implements ILogger {
         e.printStackTrace();
     }
 
-    private String timeNow() {
+    private String timeStamp() {
         LocalDateTime localDateTime = LocalDateTime.now();
         Duration since = Duration.between(startTime, localDateTime);
         long secs = since.getSeconds();
@@ -41,6 +39,6 @@ public class Logger implements ILogger {
     }
 
     private void print(PrintStream out, String type, String text) {
-        out.println(String.format("%s: %s: %s", timeNow(), type, text));
+        out.println(String.format("%s: %s: %s", timeStamp(), type, text));
     }
 }

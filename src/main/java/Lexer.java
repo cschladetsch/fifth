@@ -55,27 +55,10 @@ public class Lexer extends ProcessBase {
     @Override
     public String toString() {
         return "Lexer{" +
-                "lines=" + lines +
-                ", tokens=" + tokens +
+                tokens +
                 ", lineNumber=" + lineNumber +
                 ", offset=" + offset +
-                ", logger=" + logger +
-                ", Process=" + super.toString() +
                 '}';
-    }
-
-    //@Override
-    public String toString2() {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Lexer: ");
-        String comma = "";
-        for (Token token : tokens) {
-            stringBuilder.append(comma);
-            stringBuilder.append(token.getType());
-            comma = ", ";
-        }
-
-        return stringBuilder.toString();
     }
 
     public Optional<String> getText(StringSplice splice) {
@@ -84,16 +67,32 @@ public class Lexer extends ProcessBase {
         }
 
         int spliceLine = splice.getLine();
-        if (spliceLine < 0 || spliceLine > lines.size()) {
+        if (spliceLine < 0 || spliceLine >= lines.size()) {
             return badSplice(splice);
         }
 
         String line = lines.get(spliceLine);
-        int offset = splice.getOffset();
-        int length = line.length();
-        int end = min(length, length + offset);
+        int spliceLength = splice.getLength();
+        int spliceOffset = splice.getOffset();
+        int lineLength = line.length();
+        if (spliceOffset > lineLength || spliceOffset + spliceLength > lineLength) {
+            return badSplice(splice);
+        }
 
-        return Optional.of(line.substring(offset, offset + end));
+        return Optional.of(line.substring(spliceOffset, spliceOffset + spliceLength));
+    }
+
+    private boolean atEnd() {
+        return atEnd(offset);
+    }
+
+    private boolean atEnd(int offset) {
+        if (lineNumber == lines.size()) {
+            return true;
+        }
+
+        String line = lines.get(lineNumber);
+        return offset == line.length();
     }
 
     private Optional<String> badSplice(StringSplice splice) {
@@ -111,6 +110,10 @@ public class Lexer extends ProcessBase {
                 return false;
             }
 
+            if (hasFailed()) {
+                return false;
+            }
+
             ++lineNumber;
         }
 
@@ -120,7 +123,22 @@ public class Lexer extends ProcessBase {
     private boolean parseLine(String line) {
         if (line.isEmpty()) {
             ++lineNumber;
-            return addToken(ETokenType.Whitespace);
+            return addToken(ETokenType.Whitespace, 0);
+        }
+
+        offset = 0;
+        while (offset < line.length()) {
+            if (!nextToken()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private boolean nextToken() {
+        if (atEnd()) {
+            return false;
         }
 
         char curr = getCurrent();
@@ -140,18 +158,18 @@ public class Lexer extends ProcessBase {
             return true;
         }
 
-        return false;
+        return fail("Cannot parse " + getCurrent() + " at line:" + lineNumber + ": " + offset);
     }
 
     private boolean processOperation(char curr) {
         switch (curr) {
-            case '+': return addToken(ETokenType.Plus);
-            case '-': return addToken(ETokenType.Plus);
+            case '+': return addToken(ETokenType.Plus, 1);
+            case '-': return addToken(ETokenType.Minus, 1);
             case '=': {
                 if (peek('=')) {
                     return addToken(ETokenType.Equiv, 2);
                 }
-                return addToken(ETokenType.Store);
+                return addToken(ETokenType.Store, 1);
             }
         }
 
@@ -172,11 +190,11 @@ public class Lexer extends ProcessBase {
 
         String text = textOpt.get();
         if (text.equals("assert")) {
-            return addToken(ETokenType.Assert);
+            return addToken(ETokenType.Assert, stringSplice);
         }
 
         if (text.equals("exit")) {
-            return addToken(ETokenType.Exit);
+            return addToken(ETokenType.Exit, stringSplice);
         }
 
         return false;
@@ -190,28 +208,30 @@ public class Lexer extends ProcessBase {
         return line.charAt(offset + 1) == ch;
     }
 
-    private boolean addToken(ETokenType type) {
-        tokens.add(new Token(type, currentSplice(), this));
-        return true;
-    }
-
     private boolean addToken(ETokenType type, int len) {
-        tokens.add(new Token(type, currentSplice(len), this));
+        addToken(new Token(type, currentSplice(len), this));
         return true;
     }
 
     private boolean addToken(ETokenType type, StringSplice splice) {
-        tokens.add(new Token(type, splice, this));
+        addToken(new Token(type, splice, this));
+        return true;
+    }
+
+    private boolean addToken(Token token)
+    {
+        tokens.add(token);
+        offset += token.getSplice().getLength();
         return true;
     }
 
     private StringSplice gatherSplice(ICharCategory cat) {
-        int startOffset = offset;
-        while (cat.matches(getCurrent())) {
-            ++offset;
+        int length = 0;
+        while (!atEnd(offset + length) && cat.matches(getCurrent(offset + length))) {
+            ++length;
         }
 
-        return new StringSplice(lineNumber, startOffset, offset - startOffset);
+        return new StringSplice(lineNumber, offset, length);
     }
 
     private StringSplice currentSplice() {
@@ -223,6 +243,10 @@ public class Lexer extends ProcessBase {
     }
 
     private char getCurrent() {
+        return lines.get(lineNumber).charAt(offset);
+    }
+
+    private char getCurrent(int offset) {
         return lines.get(lineNumber).charAt(offset);
     }
 
