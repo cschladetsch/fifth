@@ -5,6 +5,6 @@
 6 2 / 3 == assert
 
 # just add a bit more
-6 2 * 2 + 14 == assert
+# 6 2 * 2 + 14 == assert
 
 # depth 0 ==

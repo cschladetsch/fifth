@@ -41,7 +41,6 @@ public class Parser extends ProcessBase {
             case Dup:
             case Print:
             case Dump:
-            case Comment:
             case Not:
             case Multiply:
             case Divide:
@@ -55,6 +54,7 @@ public class Parser extends ProcessBase {
             case CloseSquareBracket:
                 return notImplemented();
             case Whitespace:
+            case Comment:
                 return true;
             default:
                 throw new IllegalStateException("Unexpected value: " + token.getType());
