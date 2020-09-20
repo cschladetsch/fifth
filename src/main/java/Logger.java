@@ -35,7 +35,7 @@ public class Logger implements ILogger {
         long secs = since.getSeconds();
         long mins = secs/60;
         long millis = since.toMillis();
-        return String.format("%2s:%2s:3%s", mins, secs, millis);
+        return String.format("%2s:%2s:%3s", mins, secs, millis);
     }
 
     private void print(PrintStream out, String type, String text) {
