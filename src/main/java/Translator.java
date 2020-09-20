@@ -18,6 +18,13 @@ public class Translator extends ProcessBase {
         return !hasFailed();
     }
 
+    @Override
+    public String toString() {
+        return "Translator{" +
+                continuation +
+                '}';
+    }
+
     private Continuation translateContinuation(AstNode node) {
         Continuation continuation = new Continuation(translateChildren(node));
         return continuation;
@@ -47,5 +54,9 @@ public class Translator extends ProcessBase {
                 notImplemented(node.toString());
                 return null;
         }
+    }
+
+    public Continuation getContinuation() {
+        return continuation;
     }
 }

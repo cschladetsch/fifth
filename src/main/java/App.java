@@ -1,3 +1,4 @@
+import javax.xml.crypto.dsig.TransformService;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -42,11 +43,29 @@ public class App {
             return -1;
         }
 
+        Translator translator = new Translator(parser);
+        if (!translator.run() || translator.hasFailed()) {
+            logger.debug(translator.toString());
+            logger.error("Failed to translate.");
+            return -1;
+        }
 
-        logger.info(lexer.toString());
+        Executor executor = new Executor(logger);
+        executor.run(translator.getContinuation());
+        if (executor.hasFailed()) {
+            logger.debug(executor.toString());
+            logger.error("Failed to execute.");
+            return -1;
+        }
+
+//        logger.info(lexer.toString());
+//        logger.info("");
+//        logger.info(parser.toString());
+//        logger.info("");
+        logger.info(translator.toString());
         logger.info("");
-        logger.info(parser.toString());
-        logger.info("");
+//        logger.info(executor.toString());
+//        logger.info("");
 
         return 0;
     }
