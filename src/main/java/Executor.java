@@ -24,7 +24,7 @@ enum EOperation {
     Store,
     Get,
     Exists,
-    Duplicate, Dump, Multiply, Not,
+    Duplicate, Dump, Multiply, Not, Divide, Depth,
 }
 
 public class Executor extends ProcessBase {
@@ -96,6 +96,12 @@ public class Executor extends ProcessBase {
                 return EOperation.Dump;
             case Not:
                 return EOperation.Not;
+            case Multiply:
+                return EOperation.Multiply;
+            case Divide:
+                return EOperation.Divide;
+            case Depth:
+                return EOperation.Depth;
             case Comment:
                 return true;
             default:
@@ -110,6 +116,7 @@ public class Executor extends ProcessBase {
             case Plus:
             case Minus:
             case Multiply:
+            case Divide:
             case Equiv:
                 return doBinaryOp(operation);
             case Assert:
@@ -126,6 +133,9 @@ public class Executor extends ProcessBase {
                 return doNot();
             case Dump:
                 logger.debug(this.toString());
+                return true;
+            case Depth:
+                return dataPush(data.size());
             default:
                 break;
         }
@@ -228,6 +238,8 @@ public class Executor extends ProcessBase {
                 return neitherNull(first, second) && doMinus(first, second);
             case Multiply:
                 return neitherNull(first, second) && doMultiply(first, second);
+            case Divide:
+                return neitherNull(first, second) && doDivide(first, second);
             case Equiv:
                 return doEquiv(first, second);
             default:
@@ -235,8 +247,28 @@ public class Executor extends ProcessBase {
         }
     }
 
+    private boolean doDivide(Object first, Object second) {
+        if (first.getClass() == Integer.class) {
+            return dataPush((int)first / (int)second);
+        }
+
+        if (first.getClass() == Float.class) {
+            return dataPush((Float)first / (float)second);
+        }
+
+        return notImplemented("Multiply " + first.getClass().getSimpleName() + " by " + second.getClass().getSimpleName());
+    }
+
     private boolean doMultiply(Object first, Object second) {
-        return notImplemented("Multiply");
+        if (first.getClass() == Integer.class) {
+            return dataPush((int)first * (int)second);
+        }
+
+        if (first.getClass() == Float.class) {
+            return dataPush((Float)first * (float)second);
+        }
+
+        return notImplemented("Multiply " + first.getClass().getSimpleName() + " by " + second.getClass().getSimpleName());
     }
 
     private boolean doEquiv(Object first, Object second) {

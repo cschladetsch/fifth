@@ -41,6 +41,7 @@ enum ETokenType
 
     Break,
     Exit, Dump, Modulo, Comment,
+    Depth,
 }
 
 interface ICharCategory {
@@ -78,6 +79,7 @@ public class Lexer extends ProcessBase {
         tokenNames.put("print", ETokenType.Print);
         tokenNames.put("dump", ETokenType.Dump);
         tokenNames.put("not", ETokenType.Not);
+        tokenNames.put("depth", ETokenType.Depth);
     }
 
     @Override
