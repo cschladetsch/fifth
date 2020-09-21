@@ -7,6 +7,16 @@ A Forth-like interpreter written in Java.
 
 Supports concept of a *continuation*, also known as a *fibre*.
 
+Note that, like Forth, Fifth uses *reverse polish notation*. If you've only used *in-fix* notation, it will all look weird. For example, the expression:
+
+```
+a = b*2 + c
+```
+would be expressed as:
+```
+2 b * c + 'a =
+```
+
 See sample [scripts](/scripts).
 
 ## Example `scripts/TestContinuations.f`
