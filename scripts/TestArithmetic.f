@@ -1,4 +1,6 @@
+#
 # Test arithmetic, dup, print, assert, logical not
+#
 
 1 2 + dup print 3 == assert # end of line comment
 7 5 - 2 + dup print 4 == assert
@@ -15,4 +17,3 @@
 
 # ensure data stack is empty
 depth 0 == assert
-
