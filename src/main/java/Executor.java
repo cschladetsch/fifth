@@ -184,8 +184,8 @@ public class Executor extends ProcessBase {
     }
 
     private boolean doStore() {
-        Object name = dataPop();
         Object val = dataPop();
+        Object name = dataPop();
         Continuation continuation = context.peek();
         continuation.setLocal((String)name, val);
         return true;

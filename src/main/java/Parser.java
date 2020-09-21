@@ -61,15 +61,12 @@ public class Parser extends ProcessBase {
             case CloseBrace:
                 return endContinuation();
             case QuotedIdent:
+                return addChild(EAstNodeType.Value, new Identifier(true, token.getText().get()));
             case Ident:
-                return addIdent(token);
+                return addChild(EAstNodeType.Value, new Identifier(token.getText().get()));
             default:
                 return fail("Unexpected value: " + token.getType());
         }
-    }
-
-    private boolean addIdent(Token token) {
-        return addChild(EAstNodeType.Token, token);
     }
 
     private boolean endContinuation() {
