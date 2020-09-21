@@ -57,12 +57,12 @@ public class Executor extends ProcessBase {
 
     @Override
     boolean run() {
-        return execute(EOperation.Suspend);
+        return process(contextPop().get());
     }
 
     public boolean run(Continuation continuation) {
-        context.push(continuation);
-        return execute(EOperation.Suspend);
+        dataPush(continuation);
+        return execute(EOperation.Replace);
     }
 
     private boolean execute(Object object) {
@@ -111,6 +111,8 @@ public class Executor extends ProcessBase {
                 return EOperation.Depth;
             case Suspend:
                 return EOperation.Suspend;
+            case Replace:
+                return EOperation.Replace;
             case Comment:
                 return true;
             case Store:
@@ -142,6 +144,8 @@ public class Executor extends ProcessBase {
                 return doPrint();
             case Suspend:
                 return doSuspend();
+            case Replace:
+                return doReplace();
             case Not:
                 return doNot();
             case Dump:
@@ -184,10 +188,10 @@ public class Executor extends ProcessBase {
     }
 
     private boolean doStore() {
+        Identifier ident = (Identifier)dataPop();
         Object val = dataPop();
-        Object name = dataPop();
         Continuation continuation = context.peek();
-        continuation.setLocal((String)name, val);
+        continuation.setLocal(ident.getName(), val);
         return true;
     }
 
@@ -243,12 +247,21 @@ public class Executor extends ProcessBase {
 
         Continuation current = context.peek();
         Optional<Continuation> prev = contextPop();
-        context.push(current);
+        dataPush(current);
         prev.ifPresent(context::push);
 
         process(current);
 
         return true;
+    }
+
+    private boolean doReplace() {
+        if (!context.empty()) {
+            context.pop();
+        }
+
+        contextPush((Continuation)dataPop());
+        return breakFlow = true;
     }
 
     private boolean process(Continuation current) {
@@ -408,7 +421,7 @@ public class Executor extends ProcessBase {
         }
     }
 
-    private boolean dataPush(Object object) {
+    public boolean dataPush(Object object) {
         if (object instanceof Identifier) {
             Identifier ident = (Identifier)object;
             if (!ident.isQuoted()) {
