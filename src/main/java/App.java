@@ -1,3 +1,5 @@
+import com.sun.xml.internal.bind.v2.runtime.unmarshaller.LocatorEx;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -17,6 +19,17 @@ public class App {
         }
     }
 
+    private boolean runStage(String fileName, ProcessBase process) {
+        if (!process.run() || process.hasFailed()) {
+            logger.debug(process.toString());
+            logger.error("File: " + fileName);
+            logger.error(process.getClass().getSimpleName() + " Failed");
+            return true;
+        }
+
+        return false;
+    }
+
     private int run(String fileName) {
         Optional<List<String>> lines = fileContents(fileName);
         if (!lines.isPresent()) {
@@ -25,31 +38,22 @@ public class App {
         }
 
         Lexer lexer = new Lexer(logger, lines.get());
-        if (!lexer.run() || lexer.hasFailed()) {
-            logger.debug(lexer.toString());
-            logger.error("Failed to lex.");
+        if (!runStage(fileName, lexer)) {
             return -1;
         }
 
         Parser parser = new Parser(lexer);
-        if (!parser.run() || parser.hasFailed()) {
-            logger.debug(parser.toString());
-            logger.error("Failed to parse.");
+        if (!runStage(fileName, parser)) {
             return -1;
         }
 
         Translator translator = new Translator(parser);
-        if (!translator.run() || translator.hasFailed()) {
-            logger.debug(translator.toString());
-            logger.error("Failed to translate.");
+        if (!runStage(fileName, translator)) {
             return -1;
         }
 
         Executor executor = new Executor(logger);
-        executor.run(translator.getContinuation());
-        if (executor.hasFailed()) {
-            logger.debug(executor.toString());
-            logger.error("Failed to execute.");
+        if (!runStage(fileName, executor)) {
             return -1;
         }
 
@@ -104,7 +108,7 @@ public class App {
 
             int n = 0;
             for (Object obj : executor.getDataStack()) {
-                System.out.println(String.format("[%n]: %s", n++, obj.toString()));
+                System.out.println(String.format("[%d]: %s", n++, obj.toString()));
             }
         }
     }

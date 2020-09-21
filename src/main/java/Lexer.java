@@ -40,7 +40,10 @@ enum ETokenType
     CloseBrace,
 
     Break,
-    Exit, Dump, Modulo, Comment,
+    Exit,
+    Dump,
+    Modulo,
+    Comment,
     Depth,
 }
 
@@ -199,6 +202,9 @@ public class Lexer extends ProcessBase {
             case '/': return addToken(ETokenType.Divide, 1);
             case '+': return addToken(ETokenType.Plus, 1);
             case '-': return addToken(ETokenType.Minus, 1);
+            case '{': return addToken(ETokenType.OpenBrace, 1);
+            case '}': return addToken(ETokenType.CloseBrace, 1);
+            case '@': return addToken(ETokenType.Get, 1);
             case '=': {
                 if (peek('=')) {
                     return addToken(ETokenType.Equiv, 2);

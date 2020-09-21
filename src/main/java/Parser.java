@@ -47,18 +47,35 @@ public class Parser extends ProcessBase {
             case Depth:
                 return addToken(token.getType());
             case OpenParan:
-            case OpenBrace:
             case OpenSquareBracket:
             case CloseParan:
-            case CloseBrace:
             case CloseSquareBracket:
                 return notImplemented();
             case Whitespace:
             case Comment:
                 return true;
+            case OpenBrace:
+                return newContinuation();
+            case CloseBrace:
+                return endContinuation();
             default:
                 throw new IllegalStateException("Unexpected value: " + token.getType());
         }
+    }
+
+    private boolean endContinuation() {
+        if (stack.empty()) {
+            return fail("Parse stack empty.");
+        }
+
+        current = stack.pop();
+        return true;
+    }
+
+    private boolean newContinuation() {
+        stack.push(current);
+        current = enterNode(EAstNodeType.Continuation);
+        return true;
     }
 
     private boolean addToken(ETokenType tokenType) {
