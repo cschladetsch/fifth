@@ -8,7 +8,10 @@ enum EOperation {
 
     Plus,
     Minus,
+    Multiply,
+    Divide,
 
+    Not,
     Equiv,
     NotEquiv,
 
@@ -24,7 +27,11 @@ enum EOperation {
     Store,
     Get,
     Exists,
-    Duplicate, Dump, Multiply, Not, Divide, Depth,
+    Erase,
+    Duplicate,
+
+    Dump,
+    Depth,
 }
 
 public class Executor extends ProcessBase {
@@ -102,8 +109,14 @@ public class Executor extends ProcessBase {
                 return EOperation.Divide;
             case Depth:
                 return EOperation.Depth;
+            case Suspend:
+                return EOperation.Suspend;
             case Comment:
                 return true;
+            case Store:
+                return EOperation.Store;
+            case Get:
+                return EOperation.Get;
             default:
                 break;
         }
@@ -136,11 +149,46 @@ public class Executor extends ProcessBase {
                 return true;
             case Depth:
                 return dataPush(data.size());
+            case Store:
+                return doStore();
+            case Get:
+                return doGet();
             default:
                 break;
         }
 
         return fail("Unsupported operation " + operation);
+    }
+
+    private boolean doGet() {
+        return resolve((Identifier) dataPop());
+    }
+
+    private boolean resolve(Identifier ident) {
+        if (ident.isQuoted()) {
+            return dataPush(ident);
+        }
+
+        String name = ident.getName();
+        Continuation continuation = context.peek();
+        Object local = continuation.getLocal(name);
+        if (local != null) {
+            return dataPush(local);
+        }
+
+        if (globals.containsKey(name)) {
+            return dataPush(globals.get(name));
+        }
+
+        return fail("No ident called '" + name + "' in local or global scope.");
+    }
+
+    private boolean doStore() {
+        Object name = dataPop();
+        Object val = dataPop();
+        Continuation continuation = context.peek();
+        continuation.setLocal((String)name, val);
+        return true;
     }
 
     private boolean doNot() {
@@ -159,7 +207,7 @@ public class Executor extends ProcessBase {
 
         if (obj.getClass() == String.class) {
             String str = (String)obj;
-            return dataPush(str.isEmpty() || str.length() == 0); // why do I hate this
+            return dataPush(!str.isEmpty());
         }
 
         return notImplemented("Cannot negate type " + obj.getClass().getSimpleName());
@@ -203,17 +251,31 @@ public class Executor extends ProcessBase {
         return true;
     }
 
-    private void process(Continuation current) {
-        for (Object next : current.getCode()) {
-            if (!execute(next) || hasFailed()) {
-                return;
+    private boolean process(Continuation current) {
+        while (true) {
+            Object next = current.next();
+            while (next != null) {
+                if (!execute(next) || hasFailed()) {
+                    return fail("Failed to continue " + current + " at object " + current.getCurrent());
+                }
+
+                if (breakFlow) {
+                    breakFlow = false;
+                    break;
+                }
+
+                next = current.next();
             }
 
-            if (breakFlow) {
-                breakFlow = false;
+            Optional<Continuation> continuation = contextPop();
+            if (!continuation.isPresent()) {
                 break;
             }
+
+            current = continuation.get();
         }
+
+        return true;
     }
 
     public void contextPush(Continuation continuation) {
@@ -347,6 +409,13 @@ public class Executor extends ProcessBase {
     }
 
     private boolean dataPush(Object object) {
+        if (object instanceof Identifier) {
+            Identifier ident = (Identifier)object;
+            if (!ident.isQuoted()) {
+                return dataPush(resolve(ident));
+            }
+        }
+
         data.push(object);
         return true;
     }

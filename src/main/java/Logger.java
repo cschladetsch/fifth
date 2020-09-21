@@ -39,6 +39,7 @@ public class Logger implements ILogger {
     }
 
     private void print(PrintStream out, String type, String text) {
+        //out.println(String.format("%s: %s: %s: %s", timeStamp(), type, getClass().getTypeName(), text));
         out.println(String.format("%s: %s: %s", timeStamp(), type, text));
     }
 }

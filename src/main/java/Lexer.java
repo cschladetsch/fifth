@@ -21,7 +21,6 @@ enum ETokenType
     Get,
     Store,
     Ident,
-    QuotedIdent,
     Whitespace,
 
     Dup,
@@ -29,6 +28,9 @@ enum ETokenType
     Rot,
     RotN,
     Drop,
+
+    Erase,
+    Exists,
 
     OpenSquareBracket,
     CloseSquareBracket,
@@ -44,7 +46,7 @@ enum ETokenType
     Dump,
     Modulo,
     Comment,
-    Depth,
+    Depth, Clear, QuotedIdent,
 }
 
 interface ICharCategory {
@@ -92,6 +94,12 @@ public class Lexer extends ProcessBase {
                 ", lineNumber=" + lineNumber +
                 ", offset=" + offset +
                 '}';
+    }
+
+    @Override
+    protected boolean fail(String text) {
+        String prefix = String.format("@:%d:%d: ", lineNumber, offset);
+        return super.fail(prefix + text);
     }
 
     public Optional<String> getText(StringSplice splice) {
@@ -205,6 +213,8 @@ public class Lexer extends ProcessBase {
             case '{': return addToken(ETokenType.OpenBrace, 1);
             case '}': return addToken(ETokenType.CloseBrace, 1);
             case '@': return addToken(ETokenType.Get, 1);
+            case '&': return addToken(ETokenType.Suspend, 1);
+            case '\'': return addQuotedIdent();
             case '=': {
                 if (peek('=')) {
                     return addToken(ETokenType.Equiv, 2);
@@ -217,6 +227,20 @@ public class Lexer extends ProcessBase {
         }
 
         return false;
+    }
+
+    private boolean addQuotedIdent() {
+        ++offset;
+        if (atEnd()) {
+            return fail("Identifier expected.");
+        }
+
+        StringSplice stringSplice = gatherSplice(Character::isAlphabetic);
+        if (stringSplice.getLength() == 0) {
+            return fail("Identifier expected");
+        }
+
+        return addToken(ETokenType.QuotedIdent, stringSplice);
     }
 
     private boolean addComment() {
@@ -241,16 +265,16 @@ public class Lexer extends ProcessBase {
         }
 
         String text = textOpt.get();
-        if (!tokenNames.containsKey(text)) {
-            return false;
+        if (tokenNames.containsKey(text)) {
+            return addToken(tokenNames.get(text), stringSplice);
         }
 
-        return addToken(tokenNames.get(text), stringSplice);
+        return addToken(ETokenType.Ident, stringSplice);
     }
 
     private boolean peek(char ch) {
         String line = lines.get(lineNumber);
-        if (line.length() == offset)
+        if (line.length() <= offset + 1)
             return false;
 
         return line.charAt(offset + 1) == ch;

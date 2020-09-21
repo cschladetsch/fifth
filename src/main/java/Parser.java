@@ -45,6 +45,8 @@ public class Parser extends ProcessBase {
             case Multiply:
             case Divide:
             case Depth:
+            case Store:
+            case Get:
                 return addToken(token.getType());
             case OpenParan:
             case OpenSquareBracket:
@@ -58,9 +60,16 @@ public class Parser extends ProcessBase {
                 return newContinuation();
             case CloseBrace:
                 return endContinuation();
+            case QuotedIdent:
+            case Ident:
+                return addIdent(token);
             default:
-                throw new IllegalStateException("Unexpected value: " + token.getType());
+                return fail("Unexpected value: " + token.getType());
         }
+    }
+
+    private boolean addIdent(Token token) {
+        return addChild(EAstNodeType.Token, token);
     }
 
     private boolean endContinuation() {

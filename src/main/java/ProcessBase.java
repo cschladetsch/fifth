@@ -15,14 +15,14 @@ public abstract class ProcessBase {
                 '}';
     }
 
-    protected Boolean fail(String text) {
+    protected boolean fail(String text) {
         failed = true;
         this.text = text;
         logger.error(text);
         return false;
     }
 
-    public Boolean hasFailed() {
+    public boolean hasFailed() {
         return failed;
     }
 

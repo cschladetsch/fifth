@@ -22,7 +22,6 @@ public class App {
     private boolean runStage(String fileName, ProcessBase process) {
         if (!process.run() || process.hasFailed()) {
             logger.debug(process.toString());
-            logger.debug("File: " + fileName);
             logger.debug(process.getClass().getSimpleName() + " Failed");
             return false;
         }
@@ -32,6 +31,7 @@ public class App {
 
     private int run(String fileName) {
         Optional<List<String>> lines = fileContents(fileName);
+        logger.debug("File: " + fileName);
         if (!lines.isPresent()) {
             logger.error("Failed to read " + fileName);
             return -1;

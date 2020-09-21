@@ -18,8 +18,9 @@ public class Continuation {
     @Override
     public String toString() {
         return "Continuation{" +
-                "contents=" + code +
-                ", scope=" + scope +
+                "scope=" + scope +
+                ", code=" + code +
+                ", current=" + current +
                 '}';
     }
 
@@ -27,11 +28,25 @@ public class Continuation {
         return code;
     }
 
+    public int getCurrent() {
+        return current;
+    }
+
+    public Object next() {
+        if (current == code.size()) {
+            current = 0;
+            scope.clear();
+            return null;
+        }
+
+        return code.get(current++);
+    }
+
     public Map<String, Object> getScope() {
         return scope;
     }
 
-    public Boolean hasLocal(String name) {
+    public boolean hasLocal(String name) {
         return getLocal(name) != null;
     }
 
