@@ -22,12 +22,12 @@ public class App {
     private boolean runStage(String fileName, ProcessBase process) {
         if (!process.run() || process.hasFailed()) {
             logger.debug(process.toString());
-            logger.error("File: " + fileName);
-            logger.error(process.getClass().getSimpleName() + " Failed");
-            return true;
+            logger.debug("File: " + fileName);
+            logger.debug(process.getClass().getSimpleName() + " Failed");
+            return false;
         }
 
-        return false;
+        return true;
     }
 
     private int run(String fileName) {
@@ -53,6 +53,7 @@ public class App {
         }
 
         Executor executor = new Executor(logger);
+        executor.contextPush(translator.getContinuation());
         if (!runStage(fileName, executor)) {
             return -1;
         }
@@ -108,7 +109,7 @@ public class App {
 
             int n = 0;
             for (Object obj : executor.getDataStack()) {
-                System.out.println(String.format("[%d]: %s", n++, obj.toString()));
+                System.out.printf("[%d]: %s%n", n++, obj.toString());
             }
         }
     }
