@@ -85,6 +85,11 @@ public class Lexer extends ProcessBase {
         tokenNames.put("dump", ETokenType.Dump);
         tokenNames.put("not", ETokenType.Not);
         tokenNames.put("depth", ETokenType.Depth);
+        tokenNames.put("exists", ETokenType.Exists);
+        tokenNames.put("erase", ETokenType.Erase);
+        tokenNames.put("swap", ETokenType.Swap);
+        tokenNames.put("drop", ETokenType.Drop);
+        tokenNames.put("clear", ETokenType.Clear);
     }
 
     @Override

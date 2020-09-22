@@ -57,4 +57,8 @@ public class Continuation {
     public void setLocal(String name, Object val) {
         scope.put(name, val);
     }
+
+    public void removeLocal(String name) {
+        scope.remove(name);
+    }
 }

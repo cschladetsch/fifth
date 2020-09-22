@@ -31,7 +31,7 @@ enum EOperation {
     Duplicate,
 
     Dump,
-    Depth,
+    Depth, Swap, Drop, Clear,
 }
 
 public class Executor extends ProcessBase {
@@ -40,6 +40,7 @@ public class Executor extends ProcessBase {
     private final Stack<Object> data = new Stack<>();
     private boolean breakFlow;
     private final float FLOAT_EPSLION = 0.00000001f;
+    private Continuation continuation;
 
     public Executor(ILogger logger) {
         super(logger);
@@ -57,6 +58,10 @@ public class Executor extends ProcessBase {
 
     @Override
     boolean run() {
+        if (context.empty()) {
+            return false;
+        }
+
         return process(contextPop().get());
     }
 
@@ -66,15 +71,11 @@ public class Executor extends ProcessBase {
     }
 
     private boolean execute(Object object) {
-        if (object == null) {
-            return fail("Unexpected null");
+        if (object instanceof EOperation) {
+            return executeOperation((EOperation) object) || fail("Failed to execute " + object);
         }
 
-        if (object.getClass() == EOperation.class) {
-            return executeOperation((EOperation) object);
-        }
-
-        if (object.getClass() == ETokenType.class) {
+        if (object instanceof ETokenType) {
             return execute(convertToken((ETokenType)object));
         }
 
@@ -115,15 +116,23 @@ public class Executor extends ProcessBase {
                 return EOperation.Replace;
             case Comment:
                 return true;
+            case Swap:
+                return EOperation.Swap;
+            case Drop:
+                return EOperation.Drop;
+            case Erase:
+                return EOperation.Erase;
+            case Exists:
+                return EOperation.Exists;
             case Store:
                 return EOperation.Store;
             case Get:
                 return EOperation.Get;
+            case Clear:
+                return EOperation.Clear;
             default:
-                break;
+                return fail("Couldn't convert token " + token + " to something to do.");
         }
-
-        return fail("Couldn't convert token " + token + " to something to do.");
     }
 
     private boolean executeOperation(EOperation operation) {
@@ -157,11 +166,83 @@ public class Executor extends ProcessBase {
                 return doStore();
             case Get:
                 return doGet();
+            case Exists:
+                return doExists();
+            case Erase:
+                return doErase();
+            case Swap:
+                return doSwap();
+            case Drop:
+                return doDrop();
+            case Clear:
+                return doClear();
             default:
                 break;
         }
 
         return fail("Unsupported operation " + operation);
+    }
+
+    private boolean doErase() {
+        Optional<Identifier> ident = popIdentifier();
+        if (!ident.isPresent()) {
+            return false;
+        }
+
+        String name = ident.get().getName();
+        if (continuation.hasLocal(name)) {
+            continuation.removeLocal(name);
+            return true;
+        }
+
+        if (globals.containsKey(name)) {
+            globals.remove(name);
+            return true;
+        }
+
+        return fail("Couldn't find a '" + name + "' to erase");
+    }
+
+    private Optional<Identifier> popIdentifier() {
+        Object object = dataPop();
+        if (object instanceof Identifier) {
+            return Optional.of((Identifier)object);
+        }
+
+        fail("Expected ident, got " + object);
+        return Optional.empty();
+    }
+
+    private boolean doClear() {
+        data.clear();
+        return true;
+    }
+
+    private boolean doDrop() {
+        if (data.empty()) {
+            return fail("Empty stack.");
+        }
+        dataPop();
+        return true;
+    }
+
+    private boolean doSwap() {
+        if (data.size() < 2) {
+            return fail("Swap: data stack too small.");
+        }
+
+        Object a = dataPop();
+        Object b = dataPop();
+        dataPush(a);
+        dataPush(b);
+        return true;
+    }
+
+    private boolean doExists() {
+        Identifier ident = (Identifier)dataPop();
+        String name = ident.getName();
+        boolean exists = continuation.hasLocal(name) || globals.containsKey(name);
+        return dataPush(exists);
     }
 
     private boolean doGet() {
@@ -174,7 +255,6 @@ public class Executor extends ProcessBase {
         }
 
         String name = ident.getName();
-        Continuation continuation = context.peek();
         Object local = continuation.getLocal(name);
         if (local != null) {
             return dataPush(local);
@@ -190,7 +270,6 @@ public class Executor extends ProcessBase {
     private boolean doStore() {
         Identifier ident = (Identifier)dataPop();
         Object val = dataPop();
-        Continuation continuation = context.peek();
         continuation.setLocal(ident.getName(), val);
         return true;
     }
@@ -245,14 +324,11 @@ public class Executor extends ProcessBase {
             return fail("Context empty.");
         }
 
-        Continuation current = context.peek();
         Optional<Continuation> prev = contextPop();
-        dataPush(current);
+        dataPush(continuation);
         prev.ifPresent(context::push);
 
-        process(current);
-
-        return true;
+        return run();
     }
 
     private boolean doReplace() {
@@ -265,6 +341,7 @@ public class Executor extends ProcessBase {
     }
 
     private boolean process(Continuation current) {
+        continuation = current;
         while (true) {
             Object next = current.next();
             while (next != null) {
@@ -280,12 +357,12 @@ public class Executor extends ProcessBase {
                 next = current.next();
             }
 
-            Optional<Continuation> continuation = contextPop();
-            if (!continuation.isPresent()) {
+            Optional<Continuation> nextContinuation = contextPop();
+            if (!nextContinuation.isPresent()) {
                 break;
             }
 
-            current = continuation.get();
+            continuation = nextContinuation.get();
         }
 
         return true;
@@ -403,11 +480,11 @@ public class Executor extends ProcessBase {
         switch (operation) {
             case Assert: {
                 if (!trueEval(dataPop())) {
-                    fail("FAILED");
+                    //fail("FAILED");
                     return false;
                 }
 
-                logger.debug("PASSED");
+                logger.debug("Passed");
                 return true;
             }
 
@@ -425,7 +502,7 @@ public class Executor extends ProcessBase {
         if (object instanceof Identifier) {
             Identifier ident = (Identifier)object;
             if (!ident.isQuoted()) {
-                return dataPush(resolve(ident));
+                return resolve(ident);
             }
         }
 
@@ -438,19 +515,19 @@ public class Executor extends ProcessBase {
             return false;
         }
 
-        if (object.getClass() == Integer.class) {
+        if (object instanceof Integer) {
             return (int) object != 0;
         }
 
-        if (object.getClass() == Float.class) {
+        if (object instanceof Float) {
             return Math.abs((float)object) > FLOAT_EPSLION;
         }
 
-        if (object.getClass() == Boolean.class) {
+        if (object instanceof Boolean) {
             return (Boolean) object;
         }
 
-        return true;
+        return fail("Cannot convert type " + object.getClass().getSimpleName() + " to boolean.");
     }
 
     public Stack<Object> getDataStack() {

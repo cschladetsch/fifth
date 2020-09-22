@@ -12,6 +12,11 @@ public class Identifier {
         this.name = name;
     }
 
+    @Override
+    public String toString() {
+        return (quoted ? "'" : "") + name;
+    }
+
     public boolean isQuoted() {
         return quoted;
     }
