@@ -322,15 +322,9 @@ public class Executor extends ProcessBase {
     }
 
     private boolean doSuspend() {
-        if (context.empty()) {
-            return fail("Context empty.");
-        }
-
-        Optional<Continuation> prev = contextPop();
-        dataPush(continuation);
-        prev.ifPresent(context::push);
-
-        return run();
+        contextPush(continuation);
+        breakFlow = true;
+        return data.size() > 0 && data.peek() instanceof Continuation;
     }
 
     private boolean doReplace() {

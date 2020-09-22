@@ -1,13 +1,20 @@
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public class App {
     private static ILogger log;
 
     public static void main(String[] argv) {
+        log = new Logger();
+        log.info("Fifth-lang Repl");
+        log.setVerbosity(0);
+
         try {
             System.exit(new App().run(argv));
         } catch (Exception e) {
@@ -18,7 +25,7 @@ public class App {
         }
     }
 
-    private boolean stageFailed(String fileName, ProcessBase process) {
+    private boolean stageFailed(ProcessBase process) {
         if (process.run() && !process.hasFailed()) {
             return false;
         }
@@ -29,6 +36,11 @@ public class App {
     }
 
     private int run(String fileName) {
+        File root = Paths.get(fileName).toFile();
+        if (root.isDirectory()) {
+            return runAll(root) ? 0 : -1;
+        }
+
         Optional<List<String>> lines = fileContents(fileName);
         log.debug("File: " + fileName);
         if (!lines.isPresent()) {
@@ -37,23 +49,29 @@ public class App {
         }
 
         Lexer lexer = new Lexer(log, lines.get());
-        if (stageFailed(fileName, lexer)) {
+        if (stageFailed(lexer)) {
+            log.debug(lexer.toString());
             return -1;
         }
 
         Parser parser = new Parser(lexer);
-        if (stageFailed(fileName, parser)) {
+        if (stageFailed(parser)) {
+            log.debug(lexer.toString());
+            log.debug(parser.toString());
             return -1;
         }
 
         Translator translator = new Translator(parser);
-        if (stageFailed(fileName, translator)) {
+        if (stageFailed(translator)) {
+            log.debug(lexer.toString());
+            log.debug(parser.toString());
+            log.debug(translator.toString());
             return -1;
         }
 
         Executor executor = new Executor(log);
         executor.contextPush(translator.getContinuation());
-        if (stageFailed(fileName, executor)) {
+        if (stageFailed(executor)) {
             return -1;
         }
 
@@ -65,10 +83,23 @@ public class App {
         return 0;
     }
 
-    private int run(String[] argv) {
-        log = new Logger();
-        log.info("Fifth-lang Repl");
+    private boolean runAll(File root) {
+        if (root.isDirectory()) {
+            return true;
+        }
 
+        for (File file : Objects.requireNonNull(root.listFiles())) {
+            if (file.isFile()) {
+                if (run(file.getAbsolutePath()) != 0) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    private int run(String[] argv) {
         for (String fileName : argv) {
             if (run(fileName) != 0) {
                 return -1;

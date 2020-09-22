@@ -3,19 +3,17 @@ import java.util.Stack;
 public class Parser extends ProcessBase {
     private final Lexer lexer;
     private final Stack<AstNode> stack = new Stack<>();
-    private AstNode current;
 
     public Parser(Lexer lexer) {
         super(lexer.log);
         this.lexer = lexer;
-        this.current = enterNode(EAstNodeType.Continuation);
+        enterNode(EAstNodeType.Continuation);
     }
 
     @Override
     public String toString() {
         return "Parser{" +
                 "stack=" + stack +
-                ", current=" + current +
                 '}';
     }
 
@@ -82,13 +80,12 @@ public class Parser extends ProcessBase {
             return fail("Parse stack empty.");
         }
 
-        current = stack.pop();
+        leaveNode();
         return true;
     }
 
     private boolean newContinuation() {
-        stack.push(current);
-        current = enterNode(EAstNodeType.Continuation);
+        enterNode(EAstNodeType.Continuation);
         return true;
     }
 
@@ -101,7 +98,7 @@ public class Parser extends ProcessBase {
     }
 
     private boolean addChild(AstNode child) {
-        current.addChild(child);
+        current().addChild(child);
         return true;
     }
 
@@ -116,19 +113,28 @@ public class Parser extends ProcessBase {
         return false;
     }
 
-    private AstNode enterNode(EAstNodeType type) {
+    private void enterNode(EAstNodeType type) {
         AstNode node = new AstNode(type);
         stack.push(node);
-        return node;
     }
 
-    private AstNode leaveNode() {
-        return current = stack.pop();
+    private void leaveNode() {
+        if (stack.empty()) {
+            fail("Empty Parser context stack");
+            throw new IllegalStateException("Parser");
+        }
+
+        AstNode inner = stack.pop();
+        current().addChild(inner);
+    }
+
+    private AstNode current() {
+        return stack.peek();
     }
 
     public AstNode getRoot() {
-        if (stack.size() != 1) {
-            fail("Unbalanced parser stack.");
+        if (stack.size() > 1) {
+            fail("Unbalanced parser");
             return null;
         }
 

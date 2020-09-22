@@ -19,6 +19,7 @@ public class Logger implements ILogger {
         return verbosity;
     }
 
+    // TODO: use Object and not String as input arguments for all logging methods
     public void debug(String text) {
         print(System.out, "debug", text);
     }
