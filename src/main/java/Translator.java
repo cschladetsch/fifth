@@ -6,7 +6,7 @@ public class Translator extends ProcessBase {
     private Continuation continuation = new Continuation();
 
     public Translator(Parser parser) {
-        super(parser.logger);
+        super(parser.log);
         this.parser = parser;
     }
 

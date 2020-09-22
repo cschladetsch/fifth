@@ -1,10 +1,10 @@
 public abstract class ProcessBase {
-    protected ILogger logger = null;
+    protected ILogger log = null;
     private boolean failed = false;
     private String text = "";
 
     protected ProcessBase(ILogger logger) {
-        this.logger = logger;
+        this.log = logger;
     }
 
     @Override
@@ -18,7 +18,7 @@ public abstract class ProcessBase {
     protected boolean fail(String text) {
         failed = true;
         this.text = text;
-        logger.error(text);
+        log.error(text);
         return false;
     }
 

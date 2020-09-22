@@ -6,7 +6,7 @@ public class Parser extends ProcessBase {
     private AstNode current;
 
     public Parser(Lexer lexer) {
-        super(lexer.logger);
+        super(lexer.log);
         this.lexer = lexer;
         this.current = enterNode(EAstNodeType.Continuation);
     }
@@ -52,6 +52,9 @@ public class Parser extends ProcessBase {
             case Drop:
             case Erase:
             case Clear:
+            case Suspend:
+            case Resume:
+            case Replace:
                 return addToken(token.getType());
             case OpenParan:
             case OpenSquareBracket:

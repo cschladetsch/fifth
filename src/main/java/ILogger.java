@@ -6,4 +6,7 @@ public interface ILogger {
     void info(String text);
     void error(String text);
     void error(Exception e);
+    void verbose(int verbosity, String text);
+    void setVerbosity(int verbosity);
+    int getVerbosity();
 }

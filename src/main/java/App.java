@@ -1,74 +1,73 @@
-import com.sun.xml.internal.bind.v2.runtime.unmarshaller.LocatorEx;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 public class App {
-    private ILogger logger;
+    private static ILogger log;
 
     public static void main(String[] argv) {
         try {
             System.exit(new App().run(argv));
         } catch (Exception e) {
-            System.out.println(Arrays.toString(e.getStackTrace()));
+            for (StackTraceElement frame : e.getStackTrace()) {
+                log.error(frame.toString());
+            }
             System.exit(-1);
         }
     }
 
-    private boolean runStage(String fileName, ProcessBase process) {
-        if (!process.run() || process.hasFailed()) {
-            logger.debug(process.toString());
-            logger.debug(process.getClass().getSimpleName() + " Failed");
+    private boolean stageFailed(String fileName, ProcessBase process) {
+        if (process.run() && !process.hasFailed()) {
             return false;
         }
 
+        log.debug(process.toString());
+        log.debug(process.getClass().getSimpleName() + " Failed");
         return true;
     }
 
     private int run(String fileName) {
         Optional<List<String>> lines = fileContents(fileName);
-        logger.debug("File: " + fileName);
+        log.debug("File: " + fileName);
         if (!lines.isPresent()) {
-            logger.error("Failed to read " + fileName);
+            log.error("Failed to read " + fileName);
             return -1;
         }
 
-        Lexer lexer = new Lexer(logger, lines.get());
-        if (!runStage(fileName, lexer)) {
+        Lexer lexer = new Lexer(log, lines.get());
+        if (stageFailed(fileName, lexer)) {
             return -1;
         }
 
         Parser parser = new Parser(lexer);
-        if (!runStage(fileName, parser)) {
+        if (stageFailed(fileName, parser)) {
             return -1;
         }
 
         Translator translator = new Translator(parser);
-        if (!runStage(fileName, translator)) {
+        if (stageFailed(fileName, translator)) {
             return -1;
         }
 
-        Executor executor = new Executor(logger);
+        Executor executor = new Executor(log);
         executor.contextPush(translator.getContinuation());
-        if (!runStage(fileName, executor)) {
+        if (stageFailed(fileName, executor)) {
             return -1;
         }
 
-//        logger.info(lexer.toString());
-//        logger.info(parser.toString());
-//        logger.info(translator.toString());
-//        logger.info(executor.toString());
+        log.verbose(10, lexer.toString());
+        log.verbose(10, parser.toString());
+        log.verbose(10, translator.toString());
+        log.verbose(10, executor.toString());
 
         return 0;
     }
 
     private int run(String[] argv) {
-        logger = new Logger();
-        logger.info("Fifth-lang Repl");
+        log = new Logger();
+        log.info("Fifth-lang Repl");
 
         for (String fileName : argv) {
             if (run(fileName) != 0) {
@@ -83,12 +82,12 @@ public class App {
 
     private void Repl()
     {
-        Executor executor = new Executor(logger);
+        Executor executor = new Executor(log);
         while (true) {
             System.out.print("λ ");
             String text = System.console().readLine();
 
-            Lexer lexer = new Lexer(logger, text);
+            Lexer lexer = new Lexer(log, text);
             if (!lexer.run()) {
                 continue;
             }
@@ -118,7 +117,7 @@ public class App {
         try {
             return Optional.of(Files.readAllLines(Paths.get(fileName)));
         } catch (IOException e) {
-            logger.error(e.getMessage());
+            log.error(e.getMessage());
         }
 
         return Optional.empty();

@@ -7,6 +7,17 @@ public class Logger implements ILogger {
     //private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("mm:ss");
     private static final LocalDateTime startTime = LocalDateTime.now();
+    private int verbosity = 0;
+
+    @Override
+    public void setVerbosity(int verbosity) {
+        this.verbosity = verbosity;
+    }
+
+    @Override
+    public int getVerbosity() {
+        return verbosity;
+    }
 
     public void debug(String text) {
         print(System.out, "debug", text);
@@ -27,6 +38,13 @@ public class Logger implements ILogger {
     public void error(Exception e) {
         error(e.toString());
         e.printStackTrace();
+    }
+
+    @Override
+    public void verbose(int verbosity, String text) {
+        if (this.verbosity < verbosity)
+            return;
+        print(System.out, "verbose", text);
     }
 
     private String timeStamp() {

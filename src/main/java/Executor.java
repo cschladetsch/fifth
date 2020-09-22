@@ -130,6 +130,8 @@ public class Executor extends ProcessBase {
                 return EOperation.Get;
             case Clear:
                 return EOperation.Clear;
+            case Resume:
+                return EOperation.Resume;
             default:
                 return fail("Couldn't convert token " + token + " to something to do.");
         }
@@ -158,7 +160,7 @@ public class Executor extends ProcessBase {
             case Not:
                 return doNot();
             case Dump:
-                logger.debug(this.toString());
+                log.debug(this.toString());
                 return true;
             case Depth:
                 return dataPush(data.size());
@@ -298,7 +300,7 @@ public class Executor extends ProcessBase {
 
     private boolean doPrint() {
         Object obj = dataPop();
-        logger.info(obj.getClass().getSimpleName() + "=" + obj.toString());
+        log.info(obj.getClass().getSimpleName() + "=" + obj.toString());
         return true;
     }
 
@@ -484,12 +486,12 @@ public class Executor extends ProcessBase {
                     return false;
                 }
 
-                logger.debug("Passed");
+                log.debug("Passed");
                 return true;
             }
 
             case Print: {
-                logger.info(dataPop().toString());
+                log.info(dataPop().toString());
                 return true;
             }
 
