@@ -3,24 +3,24 @@ import java.util.*;
 public class Lexer extends ProcessBase {
     private final List<String> lines;
     private final List<Token> tokens = new ArrayList<>();
+    private final Map<String, ETokenType> tokenNames = new HashMap<String, ETokenType>();
     private int lineNumber;
     private int offset;
-    private final Map<String, ETokenType> tokenNames = new HashMap<String, ETokenType>();
 
     public Lexer(ILogger logger, String line) {
         this(logger, makeLines(line));
-    }
-
-    private static List<String> makeLines(String line) {
-        List<String> lines = new ArrayList<>();
-        lines.add(line);
-        return lines;
     }
 
     public Lexer(ILogger logger, List<String> lines) {
         super(logger);
         this.lines = lines;
         addKeywords();
+    }
+
+    private static List<String> makeLines(String line) {
+        List<String> lines = new ArrayList<>();
+        lines.add(line);
+        return lines;
     }
 
     private void addKeywords() {
@@ -149,6 +149,10 @@ public class Lexer extends ProcessBase {
             return addToken(ETokenType.Number, gatherSplice(Character::isDigit));
         }
 
+        if (curr == '"') {
+            return addStringLiteral();
+        }
+
         if (processAlpha(curr)) {
             return true;
         }
@@ -158,6 +162,41 @@ public class Lexer extends ProcessBase {
         }
 
         return fail("Cannot parse " + getCurrent() + " at line:" + lineNumber + ": " + offset);
+    }
+
+    private boolean addStringLiteral() {
+        int start = offset + 1;
+        int length = 0;
+        while (!atEnd(start + length)) {
+            char next = getCurrent(start + length);
+            switch (next) {
+                case '\\':
+                    ++length;
+                    char escape = getCurrent(start + length);
+                    switch (escape) {
+                        case '\\':
+                        case 'n':
+                        case 't':
+                            ++length;
+                            break;
+                        default:
+                            return fail("Bad escape character '" + escape + "'");
+                    }
+                case '"':
+                    addToken(ETokenType.String, new StringSplice(lineNumber, start, length));
+                    offset += 2;
+                    return true;
+                default:
+                    ++length;
+                    break;
+            }
+        }
+
+        return fail("Unterminated string literal");
+    }
+
+    private boolean advance() {
+        return !atEnd(offset + 1);
     }
 
     private boolean processOperation(char ch) {

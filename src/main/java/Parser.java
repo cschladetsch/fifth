@@ -31,6 +31,8 @@ public class Parser extends ProcessBase {
         switch (token.getType()) {
             case Number:
                 return addNumber(token);
+            case String:
+                return addString(token);
             case OpenParan:
             case OpenSquareBracket:
             case CloseParan:
@@ -50,6 +52,10 @@ public class Parser extends ProcessBase {
             default:
                 return addToken(token.getType());
         }
+    }
+
+    private boolean addString(Token token) {
+        return addChild(EAstNodeType.Value, token.getText().get());
     }
 
     private boolean endContinuation() {

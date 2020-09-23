@@ -62,35 +62,39 @@ public class App {
 
         Lexer lexer = new Lexer(log, lines.get());
         if (stageFailed(lexer)) {
-            log.debug(lexer.toString());
+            log.warn(lexer);
             return -1;
         }
 
         Parser parser = new Parser(lexer);
         if (stageFailed(parser)) {
-            log.debug(lexer.toString());
-            log.debug(parser.toString());
+            log.warn(lexer);
+            log.warn(parser);
             return -1;
         }
 
         Translator translator = new Translator(parser);
         if (stageFailed(translator)) {
-            log.debug(lexer.toString());
-            log.debug(parser.toString());
-            log.debug(translator.toString());
+            log.warn(lexer);
+            log.warn(parser);
+            log.warn(translator);
             return -1;
         }
 
         Executor executor = new Executor(log);
         executor.contextPush(translator.getContinuation());
         if (stageFailed(executor)) {
+            log.warn(lexer);
+            log.warn(parser);
+            log.warn(translator);
+            log.warn(executor);
             return -1;
         }
 
-        log.verbose(10, lexer.toString());
-        log.verbose(10, parser.toString());
-        log.verbose(10, translator.toString());
-        log.verbose(10, executor.toString());
+        log.verbose(10, lexer);
+        log.verbose(10, parser);
+        log.verbose(10, translator);
+        log.verbose(10, executor);
 
         return 0;
     }

@@ -540,7 +540,7 @@ public class Executor extends ProcessBase {
             return fail("Cannot compare value to null");
         }
 
-        if (first.getClass() == Float.class || second.getClass() == Float.class) {
+        if (first instanceof  Float || second instanceof Float) {
             return Math.abs((float) first - (float) second) > FLOAT_EPSLION;
         }
 
