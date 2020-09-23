@@ -86,7 +86,7 @@ public class Lexer extends ProcessBase {
     }
 
     private boolean atEnd(int offset) {
-        if (lineNumber == lines.size()) {
+        if (lineNumber >= lines.size()) {
             return true;
         }
 
@@ -121,8 +121,9 @@ public class Lexer extends ProcessBase {
 
     private boolean parseLine(String line) {
         if (line.isEmpty()) {
-            ++lineNumber;
-            return addToken(ETokenType.Whitespace, 0);
+            addToken(ETokenType.Whitespace, 0);
+            offset = 0;
+            return true;
         }
 
         offset = 0;
