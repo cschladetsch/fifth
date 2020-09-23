@@ -221,18 +221,20 @@ public class Executor extends ProcessBase {
     }
 
     private boolean doIfElse() {
-        Object test = dataPop();
-        if (!trueEval(test))
+        if (!dataPopTrue())
             doSwap();
         dataPop();
         return true;
     }
 
     private boolean doIf() {
-        Object test = dataPop();
-        if (!trueEval(test))
+        if (!dataPopTrue())
             dataPop();
         return true;
+    }
+
+    private boolean dataPopTrue() {
+        return trueEval(dataPop());
     }
 
     private boolean doErase() {
@@ -382,9 +384,15 @@ public class Executor extends ProcessBase {
     }
 
     private boolean doSuspend() {
-        contextPush(continuation);
-        contextPush((Continuation)dataPop());
-        return breakFlow = true;
+        Object next = dataPop();
+        if (next instanceof Continuation) {
+            contextPush(continuation);
+            contextPush((Continuation)next);
+            return breakFlow = true;
+        }
+
+        dataPush(next);
+        return fail("Continuation expected.");
     }
 
     private boolean doReplace() {
@@ -468,11 +476,11 @@ public class Executor extends ProcessBase {
     }
 
     private boolean doMultiply(Object first, Object second) {
-        if (first.getClass() == Integer.class) {
+        if (first instanceof Integer) {
             return dataPush((int)first * (int)second);
         }
 
-        if (first.getClass() == Float.class) {
+        if (first instanceof Float) {
             return dataPush((Float)first * (float)second);
         }
 
