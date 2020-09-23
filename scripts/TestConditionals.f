@@ -21,7 +21,7 @@ depth 0 == assert
 depth 0 == assert
 #
 { 2 + 3 * } 'body=
-2 body true if & 12 == assert
+2 body true if & 12 == assert # test trailing comment
 3 body true if & 15 == assert
 { 4 } body false if & 4 == assert
 #

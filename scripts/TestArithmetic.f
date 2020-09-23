@@ -1,7 +1,7 @@
 #
 # Test arithmetic, dup, print, assert, logical not
 #
-#1 drop # TODO: trailing comments
+1 drop # trailing comments
 2 2 * 4 == assert
 6 2 / 3 == assert
 1 2 + dup print 3 == assert

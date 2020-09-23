@@ -268,6 +268,8 @@ public class Lexer extends ProcessBase {
         int lineLength = lines.get(lineNumber).length();
         while (length < lineLength) {
             ++length;
+            if (getCurrent() == '\n')
+                break;
         }
 
         return addToken(ETokenType.Comment, length);
