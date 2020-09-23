@@ -5,46 +5,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Stack;
 
-enum EOperation {
-    None,
-
-    Plus,
-    Minus,
-    Multiply,
-    Divide,
-
-    Not,
-    Equiv,
-    NotEquiv,
-
-    Assert,
-    Break,
-    Exit,
-    Print,
-
-    Resume,
-    Suspend,
-    Replace,
-
-    Store,
-    Get,
-    Exists,
-    Erase,
-    Duplicate,
-
-    True,
-    False,
-    If,
-    IfElse,
-    For,
-    While,
-
-    Dump,
-    Depth, Swap, Drop, Clear,
-    Less, LessEqual,
-    Greater, GreaterEqual,
-}
-
 public class Executor extends ProcessBase {
     private final Map<String, Object> globals = new HashMap<String, Object>();
     private final Stack<Continuation> context = new Stack<>();

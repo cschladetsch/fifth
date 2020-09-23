@@ -35,6 +35,18 @@ public class App {
         return true;
     }
 
+    private int run(String[] argv) {
+        for (String fileName : argv) {
+            if (run(fileName) != 0) {
+                return -1;
+            }
+        }
+
+        //Repl();
+
+        return 0;
+    }
+
     private int run(String fileName) {
         File root = Paths.get(fileName).toFile();
         if (root.isDirectory()) {
@@ -93,18 +105,6 @@ public class App {
         }
 
         return true;
-    }
-
-    private int run(String[] argv) {
-        for (String fileName : argv) {
-            if (run(fileName) != 0) {
-                return -1;
-            }
-        }
-
-        //Repl();
-
-        return 0;
     }
 
     private void Repl()

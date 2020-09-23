@@ -19,20 +19,20 @@ public class Logger implements ILogger {
         return verbosity;
     }
 
-    // TODO: use Object and not String as input arguments for all logging methods
-    public void debug(String text) {
+    // use Object and not String as input arguments for all logging methods
+    public void debug(Object text) {
         print(System.out, "debug", text);
     }
 
-    public void warn(String text) {
+    public void warn(Object text) {
         print(System.out, "warn", text);
     }
 
-    public void info(String text) {
+    public void info(Object text) {
         print(System.out, "info", text);
     }
 
-    public void error(String text) {
+    public void error(Object text) {
         print(System.err, "error", text);
     }
 
@@ -42,10 +42,10 @@ public class Logger implements ILogger {
     }
 
     @Override
-    public void verbose(int verbosity, String text) {
+    public void verbose(int verbosity, Object text) {
         if (this.verbosity < verbosity)
             return;
-        print(System.out, "verbose", text);
+        print(System.out, "verbose", text.toString());
     }
 
     private String timeStamp() {
@@ -57,7 +57,7 @@ public class Logger implements ILogger {
         return String.format("%2s:%2s:%3s", mins, secs, millis);
     }
 
-    private void print(PrintStream out, String type, String text) {
+    private void print(PrintStream out, String type, Object text) {
         //out.println(String.format("%s: %s: %s: %s", timeStamp(), type, getClass().getTypeName(), text));
         out.println(String.format("%s: %s: %s", timeStamp(), type, text));
     }

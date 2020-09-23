@@ -1,16 +1,6 @@
 import java.util.ArrayList;
 import java.util.List;
 
-enum EAstNodeType {
-    None,
-    Operation,
-    Value,
-    Array,
-    Continuation,
-    Comment,
-    Token,
-}
-
 public class AstNode {
     private EAstNodeType type;
     private Object value;
