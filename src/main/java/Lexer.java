@@ -269,8 +269,9 @@ public class Lexer extends ProcessBase {
         int lineLength = lines.get(lineNumber).length();
         while (length < lineLength) {
             ++length;
-            if (getCurrent() == '\n')
+            if (getCurrent() == '\n') {
                 break;
+            }
         }
 
         return addToken(ETokenType.Comment, length);
@@ -297,8 +298,9 @@ public class Lexer extends ProcessBase {
 
     private boolean peek(char ch) {
         String line = lines.get(lineNumber);
-        if (line.length() <= offset + 1)
+        if (line.length() <= offset + 1) {
             return false;
+        }
 
         return line.charAt(offset + 1) == ch;
     }

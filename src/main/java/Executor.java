@@ -1,5 +1,3 @@
-import com.sun.org.apache.xpath.internal.operations.Bool;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -9,8 +7,8 @@ public class Executor extends ProcessBase {
     private final Map<String, Object> globals = new HashMap<String, Object>();
     private final Stack<Continuation> context = new Stack<>();
     private final Stack<Object> data = new Stack<>();
-    private boolean breakFlow;
     private final float FLOAT_EPSLION = 0.00000001f;
+    private boolean breakFlow;
     private Continuation continuation;
 
     public Executor(ILogger logger) {
@@ -286,6 +284,9 @@ public class Executor extends ProcessBase {
 
     private boolean doExists() {
         Identifier ident = (Identifier) dataPop();
+        if (ident == null)
+            return false;
+
         String name = ident.getName();
         boolean exists = continuation.hasLocal(name) || globals.containsKey(name);
         return dataPush(exists);
@@ -332,6 +333,10 @@ public class Executor extends ProcessBase {
 
     private boolean doNot() {
         Object obj = dataPop();
+        if (obj == null) {
+            return true;
+        }
+
         if (obj instanceof Boolean) {
             return dataPush(!(boolean) obj);
         }
@@ -361,15 +366,15 @@ public class Executor extends ProcessBase {
     private boolean doDuplicate() {
         Object orig = data.peek();
         if (orig instanceof Integer) {
-            return dataPush((int) orig);
+            return dataPush(orig);
         }
 
         if (orig instanceof Float) {
-            return dataPush((float) orig);
+            return dataPush(orig);
         }
 
         if (orig instanceof String) {
-            return dataPush((String) orig);
+            return dataPush(orig);
         }
 
         return notImplemented("Duplicate " + orig.getClass().getName());
@@ -475,6 +480,7 @@ public class Executor extends ProcessBase {
         if (performEquiv(first, second)) {
             return true;
         }
+
         dataPop();
         return false;
     }
@@ -540,7 +546,7 @@ public class Executor extends ProcessBase {
             return fail("Cannot compare value to null");
         }
 
-        if (first instanceof  Float || second instanceof Float) {
+        if (first instanceof Float || second instanceof Float) {
             return Math.abs((float) first - (float) second) > FLOAT_EPSLION;
         }
 
@@ -569,7 +575,7 @@ public class Executor extends ProcessBase {
         }
 
         if (first.getClass() == String.class) {
-            return dataPush((String) first + (String) second);
+            return dataPush(first + (String) second);
         }
 
         return notImplemented(first.getClass().getTypeName() + " + " + second.getClass().getName());
@@ -597,7 +603,7 @@ public class Executor extends ProcessBase {
             }
 
             case Print: {
-                log.info(dataPop().toString());
+                log.info(dataPop());
                 return true;
             }
 
