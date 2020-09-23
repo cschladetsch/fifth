@@ -264,6 +264,12 @@ public class Executor extends ProcessBase {
             return dataPush(local);
         }
 
+        for (Continuation up : context) {
+            if (up.hasLocal(name)) {
+                return dataPush(up.getLocal(name));
+            }
+        }
+
         if (globals.containsKey(name)) {
             return dataPush(globals.get(name));
         }
@@ -273,6 +279,10 @@ public class Executor extends ProcessBase {
 
     private boolean doStore() {
         Identifier ident = (Identifier)dataPop();
+        if (ident == null) {
+            return fail("Identifier expected");
+        }
+
         Object val = dataPop();
         continuation.setLocal(ident.getName(), val);
         return true;
