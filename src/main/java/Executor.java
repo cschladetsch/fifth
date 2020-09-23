@@ -1,3 +1,5 @@
+import com.sun.org.apache.xpath.internal.operations.Bool;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -278,19 +280,19 @@ public class Executor extends ProcessBase {
 
     private boolean doNot() {
         Object obj = dataPop();
-        if (obj.getClass() == Boolean.class) {
+        if (obj instanceof Boolean) {
             return dataPush(!(boolean)obj);
         }
 
-        if (obj.getClass() == Integer.class) {
-            return dataPush((int)obj != 0);
+        if (obj instanceof Integer) {
+            return dataPush((int)obj == 0);
         }
 
-        if (obj.getClass() == Float.class) {
+        if (obj instanceof Float) {
             return dataPush(Math.abs((float)obj) > FLOAT_EPSLION);
         }
 
-        if (obj.getClass() == String.class) {
+        if (obj instanceof String) {
             String str = (String)obj;
             return dataPush(!str.isEmpty());
         }
@@ -323,8 +325,8 @@ public class Executor extends ProcessBase {
 
     private boolean doSuspend() {
         contextPush(continuation);
-        breakFlow = true;
-        return data.size() > 0 && data.peek() instanceof Continuation;
+        contextPush((Continuation)dataPop());
+        return breakFlow = true;
     }
 
     private boolean doReplace() {
@@ -358,7 +360,7 @@ public class Executor extends ProcessBase {
                 break;
             }
 
-            continuation = nextContinuation.get();
+            current = continuation = nextContinuation.get();
         }
 
         return true;

@@ -84,10 +84,6 @@ public class App {
     }
 
     private boolean runAll(File root) {
-        if (root.isDirectory()) {
-            return true;
-        }
-
         for (File file : Objects.requireNonNull(root.listFiles())) {
             if (file.isFile()) {
                 if (run(file.getAbsolutePath()) != 0) {

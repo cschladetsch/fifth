@@ -9,6 +9,15 @@ public class StringSplice {
         this.length = length;
     }
 
+    @Override
+    public String toString() {
+        return "StringSplice{" +
+                "lineNumber=" + lineNumber +
+                ", offset=" + offset +
+                ", length=" + length +
+                '}';
+    }
+
     public int getLength() {
         return length;
     }
