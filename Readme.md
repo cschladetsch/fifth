@@ -37,13 +37,22 @@ See sample [scripts](/scripts).
 { 2 * } 'd =
 2 d& 4 == assert
 3 d& 6 == assert
-2 2 d& d& 8 == assert
+2 d& d& 8 == assert
 
 # Can also use locals in continuations.
 # This stores whatever is on the stack to a local called 'a',
 # then uses it to calculate 'a*2 + a'
 { 'a = a 2 * a + } 'e =
 3 e& 9 == assert # 3*2 + 3 = 9
+
+# Call continuations from within contiunuations
+{ + }'a=
+{ * }'b=
+{ a& b& } 'c=
+2 3 4 c& 14 == assert
+
+# Nested continuations
+{ { 1 + } 'a= 2 a& 3 b& } & 9 == assert
 
 # ensure the data-stack is empty
 depth 0 == assert
