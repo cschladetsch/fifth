@@ -41,6 +41,8 @@ enum EOperation {
 
     Dump,
     Depth, Swap, Drop, Clear,
+    Less, LessEqual,
+    Greater, GreaterEqual,
 }
 
 public class Executor extends ProcessBase {
@@ -153,18 +155,34 @@ public class Executor extends ProcessBase {
                 return EOperation.While;
             case For:
                 return EOperation.For;
+            case Less:
+                return EOperation.Less;
+            case LessEqual:
+                return EOperation.LessEqual;
+            case Greater:
+                return EOperation.Greater;
+            case GreaterEqual:
+                return EOperation.GreaterEqual;
             default:
                 return fail("Couldn't convert token " + token + " to something to do.");
         }
     }
 
     private boolean executeOperation(EOperation operation) {
+        if (hasFailed()) {
+            return false;
+        }
+
         switch (operation) {
             case Plus:
             case Minus:
             case Multiply:
             case Divide:
             case Equiv:
+            case Less:
+            case LessEqual:
+            case Greater:
+            case GreaterEqual:
                 return doBinaryOp(operation);
             case Assert:
                 return doUnaryOp(EOperation.Assert);
@@ -458,21 +476,73 @@ public class Executor extends ProcessBase {
                 return neitherNull(first, second) && doDivide(first, second);
             case Equiv:
                 return doEquiv(first, second);
+            case Less:
+                return doLess(first, second);
+            case LessEqual:
+                return doLessEqual(first, second);
+            case Greater:
+                return doGreater(first, second);
+            case GreaterEqual:
+                return doGreaterEqual(first, second);
             default:
                 return notImplemented();
         }
     }
 
+    private boolean doGreaterEqual(Object first, Object second) {
+        return isEquiv(first, second) || doGreater(first, second);
+    }
+
+    private boolean doLessEqual(Object first, Object second) {
+        return isEquiv(first, second) || doLess(first, second);
+    }
+
+    private boolean isEquiv(Object first, Object second) {
+        if (performEquiv(first, second)) {
+            return true;
+        }
+        dataPop();
+        return false;
+    }
+
+    private boolean performEquiv(Object first, Object second) {
+        return doEquiv(first, second) && trueEval(data.peek());
+    }
+
+    private boolean doGreater(Object first, Object second) {
+        if (first instanceof Integer) {
+            return dataPush((int)first > (int)second);
+        }
+
+        if (first instanceof Float) {
+            return dataPush(Math.abs((Float)first - (float)second) < FLOAT_EPSLION);
+        }
+
+        return notImplemented("Greater " + first.getClass().getSimpleName() + " by " + second.getClass().getSimpleName());
+    }
+
+    private boolean doLess(Object first, Object second) {
+        if (first instanceof Integer) {
+            return dataPush((int)first < (int)second);
+        }
+
+        if (first instanceof Float) {
+            return dataPush(Math.abs((Float)first - (float)second) > FLOAT_EPSLION);
+        }
+
+        return notImplemented("Less " + first.getClass().getSimpleName() + " by " + second.getClass().getSimpleName());
+    }
+
     private boolean doDivide(Object first, Object second) {
-        if (first.getClass() == Integer.class) {
+        if (first instanceof Integer) {
             return dataPush((int)first / (int)second);
         }
 
-        if (first.getClass() == Float.class) {
+        if (first instanceof Float) {
             return dataPush((Float)first / (float)second);
         }
 
-        return notImplemented("Multiply " + first.getClass().getSimpleName() + " by " + second.getClass().getSimpleName());
+        return notImplemented("Divide " + first.getClass().getSimpleName() + " by " + second.getClass().getSimpleName());
     }
 
     private boolean doMultiply(Object first, Object second) {

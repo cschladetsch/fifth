@@ -49,6 +49,7 @@ enum ETokenType
     Modulo,
     Comment,
     Depth, Clear, QuotedIdent, If, IfElse, While, For,
+    Less, Greater, LessEqual, GreaterEqual,
 }
 
 interface ICharCategory {
@@ -228,6 +229,18 @@ public class Lexer extends ProcessBase {
             case '@': return addToken(ETokenType.Get, 1);
             case '&': return addToken(ETokenType.Suspend, 1);
             case '\'': return addQuotedIdent();
+            case '<': {
+                if (peek('=')) {
+                    return addToken(ETokenType.LessEqual, 2);
+                }
+                return addToken(ETokenType.Less, 1);
+            }
+            case '>': {
+                if (peek('=')) {
+                    return addToken(ETokenType.GreaterEqual, 2);
+                }
+                return addToken(ETokenType.Greater, 1);
+            }
             case '=': {
                 if (peek('=')) {
                     return addToken(ETokenType.Equiv, 2);

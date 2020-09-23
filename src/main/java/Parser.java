@@ -31,35 +31,6 @@ public class Parser extends ProcessBase {
         switch (token.getType()) {
             case Number:
                 return addNumber(token);
-            case Plus:
-            case Minus:
-            case Equiv:
-            case Assert:
-            case Break:
-            case Dup:
-            case Print:
-            case Dump:
-            case Not:
-            case Multiply:
-            case Divide:
-            case Depth:
-            case Store:
-            case Get:
-            case Exists:
-            case Swap:
-            case Drop:
-            case Erase:
-            case Clear:
-            case Suspend:
-            case Resume:
-            case Replace:
-            case True:
-            case False:
-            case While:
-            case For:
-            case If:
-            case IfElse:
-                return addToken(token.getType());
             case OpenParan:
             case OpenSquareBracket:
             case CloseParan:
@@ -77,7 +48,7 @@ public class Parser extends ProcessBase {
             case Ident:
                 return addChild(EAstNodeType.Value, new Identifier(token.getText().get()));
             default:
-                return fail("Unexpected value: " + token.getType());
+                return addToken(token.getType());
         }
     }
 
