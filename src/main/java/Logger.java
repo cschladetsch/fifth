@@ -52,7 +52,7 @@ public class Logger implements ILogger {
         LocalDateTime localDateTime = LocalDateTime.now();
         Duration since = Duration.between(startTime, localDateTime);
         long secs = since.getSeconds();
-        long mins = secs/60;
+        long mins = secs / 60;
         long millis = since.toMillis();
         return String.format("%2s:%2s:%3s", mins, secs, millis);
     }

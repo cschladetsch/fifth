@@ -5,7 +5,7 @@ public class Lexer extends ProcessBase {
     private final List<Token> tokens = new ArrayList<>();
     private int lineNumber;
     private int offset;
-    private final Map<String, ETokenType> tokenNames = new HashMap<String,ETokenType>();
+    private final Map<String, ETokenType> tokenNames = new HashMap<String, ETokenType>();
 
     public Lexer(ILogger logger, String line) {
         this(logger, makeLines(line));
@@ -162,17 +162,28 @@ public class Lexer extends ProcessBase {
 
     private boolean processOperation(char ch) {
         switch (ch) {
-            case '#': return addComment();
-            case '%': return addToken(ETokenType.Modulo, 1);
-            case '*': return addToken(ETokenType.Multiply, 1);
-            case '/': return addToken(ETokenType.Divide, 1);
-            case '+': return addToken(ETokenType.Plus, 1);
-            case '-': return addToken(ETokenType.Minus, 1);
-            case '{': return addToken(ETokenType.OpenBrace, 1);
-            case '}': return addToken(ETokenType.CloseBrace, 1);
-            case '@': return addToken(ETokenType.Get, 1);
-            case '&': return addToken(ETokenType.Suspend, 1);
-            case '\'': return addQuotedIdent();
+            case '#':
+                return addComment();
+            case '%':
+                return addToken(ETokenType.Modulo, 1);
+            case '*':
+                return addToken(ETokenType.Multiply, 1);
+            case '/':
+                return addToken(ETokenType.Divide, 1);
+            case '+':
+                return addToken(ETokenType.Plus, 1);
+            case '-':
+                return addToken(ETokenType.Minus, 1);
+            case '{':
+                return addToken(ETokenType.OpenBrace, 1);
+            case '}':
+                return addToken(ETokenType.CloseBrace, 1);
+            case '@':
+                return addToken(ETokenType.Get, 1);
+            case '&':
+                return addToken(ETokenType.Suspend, 1);
+            case '\'':
+                return addQuotedIdent();
             case '<': {
                 if (peek('=')) {
                     return addToken(ETokenType.LessEqual, 2);
@@ -258,8 +269,7 @@ public class Lexer extends ProcessBase {
         return addToken(new Token(type, splice, this));
     }
 
-    private boolean addToken(Token token)
-    {
+    private boolean addToken(Token token) {
         tokens.add(token);
         offset += token.getSplice().getLength();
         return true;
@@ -274,6 +284,8 @@ public class Lexer extends ProcessBase {
         return new StringSplice(lineNumber, offset, length);
     }
 
+    @org.jetbrains.annotations.NotNull
+    @org.jetbrains.annotations.Contract(value = " -> new", pure = true)
     private StringSplice currentSplice() {
         return new StringSplice(lineNumber, offset, 1);
     }

@@ -58,7 +58,7 @@ public class Continuation {
         scope.put(name, val);
     }
 
-    public void removeLocal(String name) {
+    protected void removeLocal(String name) {
         scope.remove(name);
     }
 }

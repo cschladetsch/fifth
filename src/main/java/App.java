@@ -107,8 +107,7 @@ public class App {
         return true;
     }
 
-    private void Repl()
-    {
+    private void Repl() {
         Executor executor = new Executor(log);
         while (true) {
             System.out.print("λ ");

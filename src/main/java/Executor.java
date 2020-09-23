@@ -47,7 +47,7 @@ public class Executor extends ProcessBase {
         }
 
         if (object instanceof ETokenType) {
-            return execute(convertToken((ETokenType)object));
+            return execute(convertToken((ETokenType) object));
         }
 
         return dataPush(object);
@@ -222,9 +222,14 @@ public class Executor extends ProcessBase {
         }
 
         String name = ident.get().getName();
-        if (continuation.hasLocal(name)) {
-            continuation.removeLocal(name);
+        if (removeLocal(continuation, name)) {
             return true;
+        }
+
+        for (Continuation continuation : context) {
+            if (removeLocal(continuation, name)) {
+                return true;
+            }
         }
 
         if (globals.containsKey(name)) {
@@ -235,10 +240,19 @@ public class Executor extends ProcessBase {
         return fail("Couldn't find a '" + name + "' to erase");
     }
 
+    private boolean removeLocal(Continuation continuation, String name) {
+        if (!continuation.hasLocal(name)) {
+            return false;
+        }
+
+        continuation.removeLocal(name);
+        return true;
+    }
+
     private Optional<Identifier> popIdentifier() {
         Object object = dataPop();
         if (object instanceof Identifier) {
-            return Optional.of((Identifier)object);
+            return Optional.of((Identifier) object);
         }
 
         fail("Expected ident, got " + object);
@@ -271,7 +285,7 @@ public class Executor extends ProcessBase {
     }
 
     private boolean doExists() {
-        Identifier ident = (Identifier)dataPop();
+        Identifier ident = (Identifier) dataPop();
         String name = ident.getName();
         boolean exists = continuation.hasLocal(name) || globals.containsKey(name);
         return dataPush(exists);
@@ -306,7 +320,7 @@ public class Executor extends ProcessBase {
     }
 
     private boolean doStore() {
-        Identifier ident = (Identifier)dataPop();
+        Identifier ident = (Identifier) dataPop();
         if (ident == null) {
             return fail("Identifier expected");
         }
@@ -319,19 +333,19 @@ public class Executor extends ProcessBase {
     private boolean doNot() {
         Object obj = dataPop();
         if (obj instanceof Boolean) {
-            return dataPush(!(boolean)obj);
+            return dataPush(!(boolean) obj);
         }
 
         if (obj instanceof Integer) {
-            return dataPush((int)obj == 0);
+            return dataPush((int) obj == 0);
         }
 
         if (obj instanceof Float) {
-            return dataPush(Math.abs((float)obj) > FLOAT_EPSLION);
+            return dataPush(Math.abs((float) obj) > FLOAT_EPSLION);
         }
 
         if (obj instanceof String) {
-            String str = (String)obj;
+            String str = (String) obj;
             return dataPush(!str.isEmpty());
         }
 
@@ -347,15 +361,15 @@ public class Executor extends ProcessBase {
     private boolean doDuplicate() {
         Object orig = data.peek();
         if (orig instanceof Integer) {
-            return dataPush((int)orig);
+            return dataPush((int) orig);
         }
 
         if (orig instanceof Float) {
-            return dataPush((float)orig);
+            return dataPush((float) orig);
         }
 
         if (orig instanceof String) {
-            return dataPush((String)orig);
+            return dataPush((String) orig);
         }
 
         return notImplemented("Duplicate " + orig.getClass().getName());
@@ -365,7 +379,7 @@ public class Executor extends ProcessBase {
         Object next = dataPop();
         if (next instanceof Continuation) {
             contextPush(continuation);
-            contextPush((Continuation)next);
+            contextPush((Continuation) next);
             return breakFlow = true;
         }
 
@@ -378,7 +392,7 @@ public class Executor extends ProcessBase {
             context.pop();
         }
 
-        contextPush((Continuation)dataPop());
+        contextPush((Continuation) dataPop());
         return breakFlow = true;
     }
 
@@ -471,11 +485,11 @@ public class Executor extends ProcessBase {
 
     private boolean doGreater(Object first, Object second) {
         if (first instanceof Integer) {
-            return dataPush((int)first > (int)second);
+            return dataPush((int) first > (int) second);
         }
 
         if (first instanceof Float) {
-            return dataPush(Math.abs((Float)first - (float)second) < FLOAT_EPSLION);
+            return dataPush(Math.abs((Float) first - (float) second) < FLOAT_EPSLION);
         }
 
         return notImplemented("Greater " + first.getClass().getSimpleName() + " by " + second.getClass().getSimpleName());
@@ -483,11 +497,11 @@ public class Executor extends ProcessBase {
 
     private boolean doLess(Object first, Object second) {
         if (first instanceof Integer) {
-            return dataPush((int)first < (int)second);
+            return dataPush((int) first < (int) second);
         }
 
         if (first instanceof Float) {
-            return dataPush(Math.abs((Float)first - (float)second) > FLOAT_EPSLION);
+            return dataPush(Math.abs((Float) first - (float) second) > FLOAT_EPSLION);
         }
 
         return notImplemented("Less " + first.getClass().getSimpleName() + " by " + second.getClass().getSimpleName());
@@ -495,11 +509,11 @@ public class Executor extends ProcessBase {
 
     private boolean doDivide(Object first, Object second) {
         if (first instanceof Integer) {
-            return dataPush((int)first / (int)second);
+            return dataPush((int) first / (int) second);
         }
 
         if (first instanceof Float) {
-            return dataPush((Float)first / (float)second);
+            return dataPush((Float) first / (float) second);
         }
 
         return notImplemented("Divide " + first.getClass().getSimpleName() + " by " + second.getClass().getSimpleName());
@@ -507,11 +521,11 @@ public class Executor extends ProcessBase {
 
     private boolean doMultiply(Object first, Object second) {
         if (first instanceof Integer) {
-            return dataPush((int)first * (int)second);
+            return dataPush((int) first * (int) second);
         }
 
         if (first instanceof Float) {
-            return dataPush((Float)first * (float)second);
+            return dataPush((Float) first * (float) second);
         }
 
         return notImplemented("Multiply " + first.getClass().getSimpleName() + " by " + second.getClass().getSimpleName());
@@ -527,7 +541,7 @@ public class Executor extends ProcessBase {
         }
 
         if (first.getClass() == Float.class || second.getClass() == Float.class) {
-            return Math.abs((float)first - (float)second) > FLOAT_EPSLION;
+            return Math.abs((float) first - (float) second) > FLOAT_EPSLION;
         }
 
         return dataPush(first.equals(second));
@@ -555,7 +569,7 @@ public class Executor extends ProcessBase {
         }
 
         if (first.getClass() == String.class) {
-            return dataPush((String)first + (String)second);
+            return dataPush((String) first + (String) second);
         }
 
         return notImplemented(first.getClass().getTypeName() + " + " + second.getClass().getName());
@@ -594,7 +608,7 @@ public class Executor extends ProcessBase {
 
     public boolean dataPush(Object object) {
         if (object instanceof Identifier) {
-            Identifier ident = (Identifier)object;
+            Identifier ident = (Identifier) object;
             if (!ident.isQuoted()) {
                 return resolve(ident);
             }
@@ -614,7 +628,7 @@ public class Executor extends ProcessBase {
         }
 
         if (object instanceof Float) {
-            return Math.abs((float)object) > FLOAT_EPSLION;
+            return Math.abs((float) object) > FLOAT_EPSLION;
         }
 
         if (object instanceof Boolean) {
