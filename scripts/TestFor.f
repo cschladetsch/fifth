@@ -1,1 +1,3 @@
- #4 { 1 - } { 0 > } { print } for
+# for (int a = 0; a < 10; ++a) print(a);
+#0 'a=
+#{ a 10 < } { a 1+ 'a= } print for

@@ -368,15 +368,15 @@ public class Executor extends ProcessBase {
 
     private boolean doDuplicate() {
         Object orig = data.peek();
-        if (orig.getClass() == Integer.class) {
+        if (orig instanceof Integer) {
             return dataPush((int)orig);
         }
 
-        if (orig.getClass() == Float.class) {
+        if (orig instanceof Float) {
             return dataPush((float)orig);
         }
 
-        if (orig.getClass() == String.class) {
+        if (orig instanceof String) {
             return dataPush((String)orig);
         }
 
