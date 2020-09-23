@@ -53,6 +53,12 @@ public class Parser extends ProcessBase {
             case Suspend:
             case Resume:
             case Replace:
+            case True:
+            case False:
+            case While:
+            case For:
+            case If:
+            case IfElse:
                 return addToken(token.getType());
             case OpenParan:
             case OpenSquareBracket:

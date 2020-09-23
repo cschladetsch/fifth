@@ -22,6 +22,8 @@ enum ETokenType
     Store,
     Ident,
     Whitespace,
+    True,
+    False,
 
     Dup,
     Swap,
@@ -46,7 +48,7 @@ enum ETokenType
     Dump,
     Modulo,
     Comment,
-    Depth, Clear, QuotedIdent,
+    Depth, Clear, QuotedIdent, If, IfElse, While, For,
 }
 
 interface ICharCategory {
@@ -90,6 +92,12 @@ public class Lexer extends ProcessBase {
         tokenNames.put("swap", ETokenType.Swap);
         tokenNames.put("drop", ETokenType.Drop);
         tokenNames.put("clear", ETokenType.Clear);
+        tokenNames.put("true", ETokenType.True);
+        tokenNames.put("false", ETokenType.False);
+        tokenNames.put("if", ETokenType.If);
+        tokenNames.put("ifelse", ETokenType.IfElse);
+        tokenNames.put("while", ETokenType.While);
+        tokenNames.put("for", ETokenType.For);
     }
 
     @Override

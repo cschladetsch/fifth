@@ -32,6 +32,13 @@ enum EOperation {
     Erase,
     Duplicate,
 
+    True,
+    False,
+    If,
+    IfElse,
+    For,
+    While,
+
     Dump,
     Depth, Swap, Drop, Clear,
 }
@@ -134,6 +141,18 @@ public class Executor extends ProcessBase {
                 return EOperation.Clear;
             case Resume:
                 return EOperation.Resume;
+            case True:
+                return EOperation.True;
+            case False:
+                return EOperation.False;
+            case If:
+                return EOperation.If;
+            case IfElse:
+                return EOperation.IfElse;
+            case While:
+                return EOperation.While;
+            case For:
+                return EOperation.For;
             default:
                 return fail("Couldn't convert token " + token + " to something to do.");
         }
@@ -180,11 +199,40 @@ public class Executor extends ProcessBase {
                 return doDrop();
             case Clear:
                 return doClear();
+            case If:
+                return doIf();
+            case IfElse:
+                return doIfElse();
+            case For:
+                return doFor();
+            case True:
+                return dataPush(true);
+            case False:
+                return dataPush(false);
             default:
                 break;
         }
 
         return fail("Unsupported operation " + operation);
+    }
+
+    private boolean doFor() {
+        return false;
+    }
+
+    private boolean doIfElse() {
+        Object test = dataPop();
+        if (!trueEval(test))
+            doSwap();
+        dataPop();
+        return true;
+    }
+
+    private boolean doIf() {
+        Object test = dataPop();
+        if (!trueEval(test))
+            dataPop();
+        return true;
     }
 
     private boolean doErase() {
