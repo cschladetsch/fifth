@@ -1,14 +1,13 @@
 public enum EOperation {
     None,
 
-    Plus,
-    Minus,
-    Multiply,
-    Divide,
+    True, False,
 
-    Not,
-    Equiv,
-    NotEquiv,
+    Plus, Minus, Multiply, Divide,
+
+    Not, Equiv, NotEquiv,
+    Less, LessEqual,
+    Greater, GreaterEqual,
 
     Assert,
     Break,
@@ -19,22 +18,13 @@ public enum EOperation {
     Suspend,
     Replace,
 
-    Store,
-    Get,
-    Exists,
-    Erase,
+    Store, Get,
+    Exists, Erase,
+
     Duplicate,
 
-    True,
-    False,
-    If,
-    IfElse,
-    For,
-    While,
+    If, IfElse, For, While,
 
-    Dump,
-    Depth, Swap, Drop, Clear,
-    Less, LessEqual,
-    Greater, GreaterEqual,
+    Dump, Depth, Swap, Drop, Clear,
 }
 

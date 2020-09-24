@@ -23,6 +23,20 @@ public class Translator extends ProcessBase {
                 '}';
     }
 
+    private Object translate(AstNode node) {
+        switch (node.getType()) {
+            case Operation:
+            case Value:
+            case Token:
+                return node.getValue();
+            case Continuation:
+                return translateContinuation(node);
+            default:
+                notImplemented(node.toString());
+                return null;
+        }
+    }
+
     private Continuation translateContinuation(AstNode node) {
         return new Continuation(translateChildren(node));
     }
@@ -37,20 +51,6 @@ public class Translator extends ProcessBase {
         }
 
         return code;
-    }
-
-    private Object translate(AstNode node) {
-        switch (node.getType()) {
-            case Operation:
-            case Value:
-            case Token:
-                return node.getValue();
-            case Continuation:
-                return translateContinuation(node);
-            default:
-                notImplemented(node.toString());
-                return null;
-        }
     }
 
     public Continuation getContinuation() {

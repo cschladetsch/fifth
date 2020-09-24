@@ -1,50 +1,40 @@
 public enum ETokenType {
     None,
-    Not,
-    Number,
-    String,
-    Plus,
-    Minus,
-    Multiply,
-    Divide,
-    Equiv,
-    NotEquiv,
+
+    True, False,
+    Number, String,
+
+    Plus, Minus,
+    Multiply, Divide, Modulo,
+
+    Not, Equiv, NotEquiv,
+    Less, Greater, LessEqual, GreaterEqual,
+
     Assert,
     Print,
-    Quit,
-    Resume,
-    Suspend,
-    Replace,
-    Get,
-    Store,
-    Ident,
+
+    Resume, Suspend, Replace,
+
+    Get, Store, Ident, QuotedIdent,
+    Erase, Exists,
+
     Whitespace,
-    True,
-    False,
 
-    Dup,
-    Swap,
-    Rot,
-    RotN,
-    Drop,
+    Dup, Swap, Rot, RotN, Drop,
 
-    Erase,
-    Exists,
+    OpenSquareBracket, CloseSquareBracket,
 
-    OpenSquareBracket,
-    CloseSquareBracket,
+    OpenParan, CloseParan,
 
-    OpenParan,
-    CloseParan,
-
-    OpenBrace,
-    CloseBrace,
+    OpenBrace, CloseBrace,
 
     Break,
     Exit,
     Dump,
-    Modulo,
+
     Comment,
-    Depth, Clear, QuotedIdent, If, IfElse, While, For,
-    Less, Greater, LessEqual, GreaterEqual,
+
+    Depth, Clear,
+
+    If, IfElse, While, For,
 }

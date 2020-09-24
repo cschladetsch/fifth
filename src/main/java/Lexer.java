@@ -43,6 +43,7 @@ public class Lexer extends ProcessBase {
         tokenNames.put("ifelse", ETokenType.IfElse);
         tokenNames.put("while", ETokenType.While);
         tokenNames.put("for", ETokenType.For);
+        tokenNames.put("exit", ETokenType.Exit);
     }
 
     @Override
@@ -220,6 +221,10 @@ public class Lexer extends ProcessBase {
                 return addToken(ETokenType.CloseBrace, 1);
             case '@':
                 return addToken(ETokenType.Get, 1);
+            case '!':
+                return addToken(ETokenType.Replace, 1);
+            case '^':
+                return addToken(ETokenType.Resume, 1);
             case '&':
                 return addToken(ETokenType.Suspend, 1);
             case '\'':

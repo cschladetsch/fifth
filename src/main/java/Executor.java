@@ -7,7 +7,7 @@ public class Executor extends ProcessBase {
     private final Map<String, Object> globals = new HashMap<String, Object>();
     private final Stack<Continuation> context = new Stack<>();
     private final Stack<Object> data = new Stack<>();
-    private final float FLOAT_EPSLION = 0.00000001f;
+    private final float FLOAT_EPSILON = 0.00000001f;
     private boolean breakFlow;
     private Continuation continuation;
 
@@ -36,102 +36,23 @@ public class Executor extends ProcessBase {
 
     public boolean run(Continuation continuation) {
         dataPush(continuation);
-        return execute(EOperation.Replace);
+        return execute(ETokenType.Replace);
     }
 
     private boolean execute(Object object) {
-        if (object instanceof EOperation) {
-            return executeOperation((EOperation) object) || fail("Failed to execute " + object);
-        }
-
         if (object instanceof ETokenType) {
-            return execute(convertToken((ETokenType) object));
+            return execute(((ETokenType) object));
         }
 
         return dataPush(object);
     }
 
-    private Object convertToken(ETokenType token) {
-        switch (token) {
-            case Plus:
-                return EOperation.Plus;
-            case Minus:
-                return EOperation.Minus;
-            case Equiv:
-                return EOperation.Equiv;
-            case NotEquiv:
-                return EOperation.NotEquiv;
-            case Assert:
-                return EOperation.Assert;
-            case Dup:
-                return EOperation.Duplicate;
-            case Print:
-                return EOperation.Print;
-            case Break:
-                return EOperation.Break;
-            case Dump:
-                return EOperation.Dump;
-            case Not:
-                return EOperation.Not;
-            case Multiply:
-                return EOperation.Multiply;
-            case Divide:
-                return EOperation.Divide;
-            case Depth:
-                return EOperation.Depth;
-            case Suspend:
-                return EOperation.Suspend;
-            case Replace:
-                return EOperation.Replace;
-            case Comment:
-                return true;
-            case Swap:
-                return EOperation.Swap;
-            case Drop:
-                return EOperation.Drop;
-            case Erase:
-                return EOperation.Erase;
-            case Exists:
-                return EOperation.Exists;
-            case Store:
-                return EOperation.Store;
-            case Get:
-                return EOperation.Get;
-            case Clear:
-                return EOperation.Clear;
-            case Resume:
-                return EOperation.Resume;
-            case True:
-                return EOperation.True;
-            case False:
-                return EOperation.False;
-            case If:
-                return EOperation.If;
-            case IfElse:
-                return EOperation.IfElse;
-            case While:
-                return EOperation.While;
-            case For:
-                return EOperation.For;
-            case Less:
-                return EOperation.Less;
-            case LessEqual:
-                return EOperation.LessEqual;
-            case Greater:
-                return EOperation.Greater;
-            case GreaterEqual:
-                return EOperation.GreaterEqual;
-            default:
-                return fail("Couldn't convert token " + token + " to something to do.");
-        }
-    }
-
-    private boolean executeOperation(EOperation operation) {
+    private boolean execute(ETokenType token) {
         if (hasFailed()) {
             return false;
         }
 
-        switch (operation) {
+        switch (token) {
             case Plus:
             case Minus:
             case Multiply:
@@ -141,12 +62,12 @@ public class Executor extends ProcessBase {
             case LessEqual:
             case Greater:
             case GreaterEqual:
-                return doBinaryOp(operation);
+                return doBinaryOp(token);
             case Assert:
                 return doUnaryOp(EOperation.Assert);
             case Break:
                 return breakFlow = true;
-            case Duplicate:
+            case Dup:
                 return doDuplicate();
             case Print:
                 return doPrint();
@@ -189,7 +110,7 @@ public class Executor extends ProcessBase {
                 break;
         }
 
-        return fail("Unsupported operation " + operation);
+        return fail("Unsupported operation " + token);
     }
 
     private boolean doFor() {
@@ -346,7 +267,7 @@ public class Executor extends ProcessBase {
         }
 
         if (obj instanceof Float) {
-            return dataPush(Math.abs((float) obj) > FLOAT_EPSLION);
+            return dataPush(Math.abs((float) obj) > FLOAT_EPSILON);
         }
 
         if (obj instanceof String) {
@@ -440,7 +361,7 @@ public class Executor extends ProcessBase {
         return Optional.of(context.pop());
     }
 
-    private boolean doBinaryOp(EOperation operation) {
+    private boolean doBinaryOp(ETokenType operation) {
         Object second = dataPop();
         Object first = dataPop();
 
@@ -495,7 +416,7 @@ public class Executor extends ProcessBase {
         }
 
         if (first instanceof Float) {
-            return dataPush(Math.abs((Float) first - (float) second) < FLOAT_EPSLION);
+            return dataPush(Math.abs((Float) first - (float) second) < FLOAT_EPSILON);
         }
 
         return notImplemented("Greater " + first.getClass().getSimpleName() + " by " + second.getClass().getSimpleName());
@@ -507,7 +428,7 @@ public class Executor extends ProcessBase {
         }
 
         if (first instanceof Float) {
-            return dataPush(Math.abs((Float) first - (float) second) > FLOAT_EPSLION);
+            return dataPush(Math.abs((Float) first - (float) second) > FLOAT_EPSILON);
         }
 
         return notImplemented("Less " + first.getClass().getSimpleName() + " by " + second.getClass().getSimpleName());
@@ -547,7 +468,7 @@ public class Executor extends ProcessBase {
         }
 
         if (first instanceof Float || second instanceof Float) {
-            return Math.abs((float) first - (float) second) > FLOAT_EPSLION;
+            return Math.abs((float) first - (float) second) > FLOAT_EPSILON;
         }
 
         return dataPush(first.equals(second));
@@ -634,7 +555,7 @@ public class Executor extends ProcessBase {
         }
 
         if (object instanceof Float) {
-            return Math.abs((float) object) > FLOAT_EPSLION;
+            return Math.abs((float) object) > FLOAT_EPSILON;
         }
 
         if (object instanceof Boolean) {
