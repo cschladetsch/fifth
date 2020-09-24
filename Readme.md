@@ -17,7 +17,7 @@ would be expressed as:
 2 b * c + 'a =
 ```
 
-See sample [scripts](/scripts).
+See sample [scripts](/scripts). Note that MarkDown files are also executable *fifth-lang* files.
 
 ## Executable Markdown
 See an example of Literate Programming with [fifth-lang using Markdown](scripts/TestMarkDown.md)
