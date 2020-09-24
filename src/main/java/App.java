@@ -53,7 +53,7 @@ public class App {
             return runAll(root) ? 0 : -1;
         }
 
-        Optional<List<String>> lines = fileContents(fileName);
+        Optional<List<String>> lines = fileCodeContents(fileName);
         log.debug("File: " + fileName);
         if (!lines.isPresent()) {
             log.error("Failed to read " + fileName);
@@ -142,10 +142,43 @@ public class App {
             }
         }
     }
+    private static String getFileExtension(String fileName) {
+        int dotIndex = fileName.lastIndexOf(".");
+        if (dotIndex != -1 && dotIndex != 0) {
+            return fileName.substring(fileName.lastIndexOf(".") + 1);
+        }
 
-    private Optional<List<String>> fileContents(String fileName) {
+        return "";
+    }
+
+    public static Optional<List<String>> fileContents(String fileName) {
         try {
             return Optional.of(Files.readAllLines(Paths.get(fileName)));
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+        return Optional.empty();
+    }
+
+    public static Optional<List<String>> fileCodeContents(String fileName) {
+        try {
+            Path path = Paths.get(fileName);
+            if (!Files.exists(path)) {
+                return Optional.empty();
+            }
+
+            List<String> code = null;
+            if (getFileExtension(path.getFileName().toString()).equals("md")) {
+                StripMarkdown stripped = new StripMarkdown(log, path);
+                if (stripped.run()) {
+                    code = stripped.getCodeText();
+                }
+            }
+            else {
+                code = Files.readAllLines(path);
+            }
+
+            return Optional.of(code);
         } catch (IOException e) {
             log.error(e.getMessage());
         }

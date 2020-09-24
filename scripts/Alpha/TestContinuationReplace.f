@@ -1,5 +1,6 @@
 #
 # Test continuation replacement.
+#
 # When we use '&' to invoke a continuation, it is
 # like calling a subroutine: control will return to the
 # calling context after the subroutine ends. This is
