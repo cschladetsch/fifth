@@ -13,14 +13,24 @@ Note that, like Forth, Fifth uses *reverse polish notation*. If you've only used
 a = b*2 + c
 ```
 would be expressed as:
-```
+```f
 2 b * c + 'a =
 ```
 
 See sample [scripts](/scripts).
 
-## Example `scripts/TestContinuations.f`
-```
+## Executable Markdown
+See an example of Literate Programming with [fifth-lang using Markdown](scripts/TestMarkDown.md)
+
+
+## Documentation
+The [root](Doc/Readme.md) of the language documentation is fully fledged out and very coherent.
+
+## Example [Script](scripts/TestContinuations.f)
+This will all look like nonsense at first. But, it can actually be executed live from this Readme.md file.
+See above section for details.
+
+```f
 #
 # Test basic continuations
 #
@@ -57,3 +67,20 @@ See sample [scripts](/scripts).
 # ensure the data-stack is empty
 depth 0 == assert
 ```
+
+## Todo
+- [ ] Better error reporting at each stage:
+  - [ ] Lexer
+  - [ ] Parser
+  - [ ] Translator
+  - [ ] Executor
+- [ ] Replace operator
+- [ ] Resume operator
+- [ ] For loops
+- [ ] While loops
+- [ ] Language description other than tests and code
+- [ ] Interaction with local file system: **Danger**
+- [ ] Basic REST calls: **Danger**
+
+## Known Bugs
+* A final line in a script with a trailing comment fails to parse.
