@@ -6,6 +6,16 @@ import java.util.List;
 import java.util.Optional;
 
 public class FileUtil {
+
+    public static String getFileExtension(String fileName) {
+        int dotIndex = fileName.lastIndexOf(".");
+        if (dotIndex != -1 && dotIndex != 0) {
+            return fileName.substring(fileName.lastIndexOf(".") + 1);
+        }
+
+        return "";
+    }
+
     public static Optional<FileWriter> newWriter(String path) {
         try {
             return Optional.of(new FileWriter(path));
@@ -28,7 +38,9 @@ public class FileUtil {
 
     public static void println(FileWriter fileWriter, String s) {
         try {
-            fileWriter.write(s + "\n");
+            if (fileWriter != null) {
+                fileWriter.write(s + "\n");
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -36,7 +48,9 @@ public class FileUtil {
 
     public static void close(FileWriter fileWriter) {
         try {
-            fileWriter.close();
+            if (fileWriter != null) {
+                fileWriter.close();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

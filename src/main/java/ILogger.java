@@ -2,7 +2,7 @@ import java.util.EnumSet;
 
 public interface ILogger {
     void setOutputs(EnumSet<ELogLevel> logLevels);
-    void addLogger(IPrinter chain);
+    void addLogger(ILogSink chain);
     void debug(Object text);
     void warn(Object text);
     void info(Object text);
@@ -12,4 +12,6 @@ public interface ILogger {
     void setVerbosity(int verbosity);
     void close();
     int getVerbosity();
+
+    void removeLogger(ILogSink logSink);
 }

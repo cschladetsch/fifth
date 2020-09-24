@@ -5,24 +5,29 @@ import java.util.EnumSet;
 import java.util.List;
 
 // TODO: Use for all files, not just Markdown.
-public class MarkdownProcessor extends ProcessBase implements IPrinter {
-    private final List<String> code = new ArrayList<>();
+public class MarkdownProcessor extends ProcessBase implements ILogSink {
+    private List<String> code = new ArrayList<>();
     private final Path path;
     private EnumSet<ELogLevel> logLevels = EnumSet.allOf(ELogLevel.class);
     private List<String> text = new ArrayList<>();
     private FileWriter fileWriter;
+    private String extension;
 
     public MarkdownProcessor(ILogger logger, Path path) {
         super(logger);
         this.path = path;
-        logger.addLogger(this);
     }
 
     @Override
     boolean run() {
-        String pathName = path.toString();
+        String pathName = path.toAbsolutePath().toString();
+        extension = FileUtil.getFileExtension(pathName);
+        if (!extension.equals("md") && !extension.equals("f"))
+            return false;
+
         FileUtil.newWriter(pathName + ".txt").ifPresent(f -> fileWriter = f);
         FileUtil.contents(pathName).ifPresent(this::gatherCode);
+        log.addLogger(this);
         return true;
     }
 
@@ -41,6 +46,7 @@ public class MarkdownProcessor extends ProcessBase implements IPrinter {
     @Override
     public void close() {
         FileUtil.close(fileWriter);
+        log.removeLogger(this);
     }
 
     public List<String> getCodeText() {
@@ -49,13 +55,21 @@ public class MarkdownProcessor extends ProcessBase implements IPrinter {
 
     private void gatherCode(List<String> text) {
         this.text = text;
+        String fileName = path.getFileName().toString();
+        if (extension.equals("md")) {
+            readMarkdownContents();
+        } else if (extension.equals("f")) {
+            code = text;
+        }
+    }
+
+    private void readMarkdownContents() {
         int lineNumber = 0;
         while (lineNumber < text.size()) {
             String line = text.get(lineNumber);
             if (line.trim().startsWith("```f")) {
                 lineNumber = readCodeLines(lineNumber);
-            }
-            else {
+            } else {
                 ++lineNumber;
             }
         }

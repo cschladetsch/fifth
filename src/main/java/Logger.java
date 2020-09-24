@@ -10,7 +10,7 @@ public class Logger implements ILogger {
     //private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("mm:ss");
     private static final LocalDateTime startTime = LocalDateTime.now();
-    private final List<IPrinter> chainedLogs = new ArrayList<>();
+    private final List<ILogSink> chainedLogs = new ArrayList<>();
     private EnumSet<ELogLevel> logLevels = EnumSet.allOf(ELogLevel.class);
     private int verbosity = 0;
 
@@ -25,8 +25,13 @@ public class Logger implements ILogger {
     }
 
     @Override
+    public void removeLogger(ILogSink logSink) {
+        chainedLogs.remove(logSink);
+    }
+
+    @Override
     public void close() {
-        for (IPrinter other : chainedLogs) {
+        for (ILogSink other : chainedLogs) {
             other.close();
         }
     }
@@ -37,8 +42,10 @@ public class Logger implements ILogger {
     }
 
     @Override
-    public void addLogger(IPrinter next) {
-        chainedLogs.add(next);
+    public void addLogger(ILogSink next) {
+        if (!chainedLogs.contains(next)) {
+            chainedLogs.add(next);
+        }
     }
 
     // use Object and not String as input arguments for all logging methods
@@ -84,7 +91,7 @@ public class Logger implements ILogger {
             out.println(output);
         }
 
-        for (IPrinter other : chainedLogs) {
+        for (ILogSink other : chainedLogs) {
             other.print(type, output);
         }
     }

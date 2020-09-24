@@ -61,15 +61,12 @@ public class App {
         }
 
         log.debug("File: " + fileName);
-        Optional<List<String>> lines = fileCodeContents(fileName);
-        if (!lines.isPresent()) {
-            log.error("Failed to read " + fileName);
-            return -1;
-        }
-
-        Lexer lexer = new Lexer(log, lines.get());
+        MarkdownProcessor processor = new MarkdownProcessor(log, Paths.get(fileName));
+        processor.run();
+        Lexer lexer = new Lexer(log, processor.getCodeText());
         if (stageFailed(lexer)) {
             log.warn(lexer);
+            processor.close();
             return -1;
         }
 
@@ -77,6 +74,7 @@ public class App {
         if (stageFailed(parser)) {
             log.warn(lexer);
             log.warn(parser);
+            processor.close();
             return -1;
         }
 
@@ -85,6 +83,7 @@ public class App {
             log.warn(lexer);
             log.warn(parser);
             log.warn(translator);
+            processor.close();
             return -1;
         }
 
@@ -95,6 +94,7 @@ public class App {
             log.warn(parser);
             log.warn(translator);
             log.warn(executor);
+            processor.close();
             return -1;
         }
 
@@ -103,6 +103,7 @@ public class App {
         log.verbose(10, translator);
         log.verbose(10, executor);
 
+        processor.close();
         return 0;
     }
 
@@ -149,39 +150,13 @@ public class App {
             }
         }
     }
-    private static String getFileExtension(String fileName) {
-        int dotIndex = fileName.lastIndexOf(".");
-        if (dotIndex != -1 && dotIndex != 0) {
-            return fileName.substring(fileName.lastIndexOf(".") + 1);
-        }
-
-        return "";
-    }
-
-    public static Optional<List<String>> fileCodeContents(String fileName) {
-        try {
-            Path path = Paths.get(fileName);
-            if (!Files.exists(path)) {
-                return Optional.empty();
-            }
-
-            List<String> code = null;
-            if (getFileExtension(path.getFileName().toString()).equals("md")) {
-                MarkdownProcessor stripped = new MarkdownProcessor(log, path);
-                if (stripped.run()) {
-                    code = stripped.getCodeText();
-                }
-            }
-            else {
-                code = Files.readAllLines(path);
-            }
-
-            return Optional.of(code);
-        } catch (IOException e) {
-            log.error(e.getMessage());
-        }
-
-        return Optional.empty();
-    }
+//    public static Optional<List<String>> fileCodeContents(String fileName) {
+//        Path path = Paths.get(fileName);
+//        if (!Files.exists(path)) {
+//            return Optional.empty();
+//        }
+//
+//        return = new MarkdownProcessor(log, path);
+//    }
 }
 

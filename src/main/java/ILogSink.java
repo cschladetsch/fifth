@@ -1,6 +1,6 @@
 import java.util.EnumSet;
 
-public interface IPrinter {
+public interface ILogSink {
     void setOutputs(EnumSet<ELogLevel> logLevels);
     void print(ELogLevel level, String text);
     void close();
