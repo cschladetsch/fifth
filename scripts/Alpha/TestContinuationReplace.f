@@ -18,7 +18,7 @@
 
 0 'n=
 
-{ { exit } { n 1 + 'n= } n 10000 == ifelse & } 'e= # exit the app if n equals 1000 otherwise increment it
+{ { exit } { n 1 + 'n= } n 10000 == ifElse & } 'e= # exit the app if n equals 1000 otherwise increment it
 
 { e& b! } 'a= # suspend to e, then replace with b
 { e& a! } 'b= # suspend to e, then replace with a

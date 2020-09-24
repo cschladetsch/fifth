@@ -25,7 +25,6 @@ public class Lexer extends ProcessBase {
 
     private void addKeywords() {
         tokenNames.put("assert", ETokenType.Assert);
-        tokenNames.put("exit", ETokenType.Exit);
         tokenNames.put("break", ETokenType.Break);
         tokenNames.put("dup", ETokenType.Dup);
         tokenNames.put("print", ETokenType.Print);
@@ -40,10 +39,11 @@ public class Lexer extends ProcessBase {
         tokenNames.put("true", ETokenType.True);
         tokenNames.put("false", ETokenType.False);
         tokenNames.put("if", ETokenType.If);
-        tokenNames.put("ifelse", ETokenType.IfElse);
+        tokenNames.put("ifElse", ETokenType.IfElse);
         tokenNames.put("while", ETokenType.While);
         tokenNames.put("for", ETokenType.For);
         tokenNames.put("exit", ETokenType.Exit);
+        tokenNames.put("showStack", ETokenType.ShowStack);
     }
 
     @Override

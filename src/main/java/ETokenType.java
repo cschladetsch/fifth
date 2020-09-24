@@ -31,6 +31,7 @@ public enum ETokenType {
     Break,
     Exit,
     Dump,
+    ShowStack,
 
     Comment,
 

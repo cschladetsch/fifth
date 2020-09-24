@@ -12,11 +12,11 @@ depth 0 == assert
 1 false if
 depth 0 == assert
 
-1 2 true ifelse
+1 2 true ifElse
 1 == assert
 depth 0 == assert
 
-1 2 false ifelse
+1 2 false ifElse
 2 == assert
 depth 0 == assert
 
@@ -28,5 +28,5 @@ depth 0 == assert
 # let a = 4;
 # if (a == 4) print(123); else print(456);
 4 'a=
-123 456 a 4 == ifelse print
-123 456 a 3 == ifelse print
+123 456 a 4 == ifElse print
+123 456 a 3 == ifElse print

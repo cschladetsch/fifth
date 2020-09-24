@@ -8,3 +8,7 @@
 1 2 3 depth 3 == assert
 1 2 3 clear depth 0 == assert
 1 2 3 drop drop depth 1 == assert
+clear
+1 2 3 "Foo" showStack
+"Done" print
+

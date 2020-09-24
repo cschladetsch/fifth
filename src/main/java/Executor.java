@@ -8,8 +8,9 @@ public class Executor extends ProcessBase {
     private final Stack<Continuation> context = new Stack<>();
     private final Stack<Object> data = new Stack<>();
     private final float FLOAT_EPSILON = 0.00000001f;
-    private boolean breakFlow;
     private Continuation continuation;
+    private boolean breakFlow;
+    private final boolean showTypesInPrint = false;
 
     public Executor(ILogger logger) {
         super(logger);
@@ -106,11 +107,31 @@ public class Executor extends ProcessBase {
                 return dataPush(true);
             case False:
                 return dataPush(false);
+            case ShowStack:
+                return doShowStack();
             default:
                 break;
         }
 
         return fail("Unsupported operation " + token);
+    }
+
+    public String createStackString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        int n = data.size() - 1;
+        for (Object obj : data) {
+            String text = String.format("[%2d]: %s", n--, obj);
+            stringBuilder.append(text);
+            if (n > -1)
+                stringBuilder.append("\n");
+        }
+        stringBuilder.insert(0, "\n");
+        return stringBuilder.toString();
+    }
+
+    private boolean doShowStack() {
+        log.info(createStackString());
+        return true;
     }
 
     private boolean doFor() {
@@ -280,8 +301,14 @@ public class Executor extends ProcessBase {
 
     private boolean doPrint() {
         Object obj = dataPop();
-        ///log.info(obj.getClass().getSimpleName() + "=" + obj.toString());
-        log.info(obj.toString());
+        if (obj == null) {
+            log.info("null");
+        } else if (showTypesInPrint) {
+            log.info(obj.getClass().getSimpleName() + "=" + obj.toString());
+        } else {
+            log.info(obj.toString());
+        }
+
         return true;
     }
 
@@ -329,7 +356,7 @@ public class Executor extends ProcessBase {
             Object next = current.next();
             while (next != null) {
                 if (!execute(next) || hasFailed()) {
-                    return fail("Failed to continue " + current + " at object " + current.getCurrent());
+                    return hasFailed() || fail("Failed to continue " + current + " at object " + current.getCurrent());
                 }
 
                 if (breakFlow) {
@@ -351,6 +378,10 @@ public class Executor extends ProcessBase {
         return true;
     }
 
+    public Stack<Object> getDataStack() {
+        return data;
+    }
+
     public void contextPush(Continuation continuation) {
         context.push(continuation);
     }
@@ -359,6 +390,7 @@ public class Executor extends ProcessBase {
         if (context.empty()) {
             return Optional.empty();
         }
+
         return Optional.of(context.pop());
     }
 
@@ -420,7 +452,7 @@ public class Executor extends ProcessBase {
             return dataPush(Math.abs((Float) first - (float) second) < FLOAT_EPSILON);
         }
 
-        return notImplemented("Greater " + first.getClass().getSimpleName() + " by " + second.getClass().getSimpleName());
+        return notImplemented("Greater", first, second);
     }
 
     private boolean doLess(Object first, Object second) {
@@ -432,7 +464,7 @@ public class Executor extends ProcessBase {
             return dataPush(Math.abs((Float) first - (float) second) > FLOAT_EPSILON);
         }
 
-        return notImplemented("Less " + first.getClass().getSimpleName() + " by " + second.getClass().getSimpleName());
+        return notImplemented("Less ", first, second);
     }
 
     private boolean doDivide(Object first, Object second) {
@@ -444,7 +476,7 @@ public class Executor extends ProcessBase {
             return dataPush((Float) first / (float) second);
         }
 
-        return notImplemented("Divide " + first.getClass().getSimpleName() + " by " + second.getClass().getSimpleName());
+        return notImplemented("Divide ", first, second);
     }
 
     private boolean doMultiply(Object first, Object second) {
@@ -456,7 +488,11 @@ public class Executor extends ProcessBase {
             return dataPush((Float) first * (float) second);
         }
 
-        return notImplemented("Multiply " + first.getClass().getSimpleName() + " by " + second.getClass().getSimpleName());
+        return notImplemented("Multiply ", first, second);
+    }
+
+    private boolean notImplemented(String operation, Object first, Object second) {
+        return notImplemented(operation + " " + first.getClass().getSimpleName() + " with " + second.getClass().getSimpleName());
     }
 
     private boolean doEquiv(Object first, Object second) {
@@ -477,7 +513,7 @@ public class Executor extends ProcessBase {
 
     private boolean neitherNull(Object first, Object second) {
         if (first == null || second == null) {
-            return fail("Unexpected null value");
+            return fail("Unexpected null value.");
         }
 
         return true;
@@ -520,7 +556,7 @@ public class Executor extends ProcessBase {
                     return false;
                 }
 
-                log.debug("Passed");
+                log.debug("Passed.");
                 return true;
             }
 
@@ -564,9 +600,5 @@ public class Executor extends ProcessBase {
         }
 
         return fail("Cannot convert type " + object.getClass().getSimpleName() + " to boolean.");
-    }
-
-    public Stack<Object> getDataStack() {
-        return data;
     }
 }

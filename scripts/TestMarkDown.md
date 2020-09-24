@@ -26,12 +26,15 @@ The following is a code-block with type *f* (e.g. **\`\`\`f**)
 
 Running this file through the *fifth-lang processor*, a new file called `TestMarkDown.md.txt` is created, containing:
 ```
-00:00:077:    Info: String=Hello, Markdown!
-00:00:077:    Info: Integer=6
-00:00:078:   Debug: Passed
+00:00:077:  Info: Hello, Markdown!
+00:00:077:  Info: 6
+00:00:078: Debug: Passed
 ```
 
 Note the format of the output is:
 ```
 min:sec:millis:level: output
 ```
+
+## Future Work
+Of course, the same approach can be taken for all other code-blocks in Markdown files. I just thought it was a good way to document the test cases for my little toy language.
