@@ -1,7 +1,10 @@
-#
-# Test arithmetic, dup, print, assert, logical not
-#
-1 drop # trailing comments
+# Test arithmetic
+Test basic arithmetic like plus, minus, multiply, divide operations.
+
+Also, uses dup, print, assert, logical not. Really should be broken down into separate tests.
+
+```f
+1 drop # test trailing comments
 2 2 * 4 == assert
 6 2 / 3 == assert
 
@@ -19,3 +22,5 @@
 
 # ensure data stack is empty
 depth 0 == assert
+```
+
