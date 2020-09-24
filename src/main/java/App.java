@@ -1,6 +1,4 @@
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -12,30 +10,26 @@ import java.util.Optional;
 
 public class App {
     private static ILogger log;
-    private static List<FileWriter> logFiles = new ArrayList<>();
+    private static List<MarkdownProcessor> logFiles = new ArrayList<>();
 
     public static void main(String[] argv) {
         log = new Logger();
-        log.info("Fifth-lang Repl");
+        log.info("fifth-lang v0.1");
         log.setVerbosity(0);
 
+        int result = 0;
         try {
-            System.exit(new App().run(argv));
+            result = new App().run(argv);
         } catch (Exception e) {
             for (StackTraceElement frame : e.getStackTrace()) {
                 log.error(frame.toString());
             }
+            result = -1;
         }
 
-        for (FileWriter writer : logFiles) {
-            try {
-                writer.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+        log.close();
 
-        System.exit(-1);
+        System.exit(result);
     }
 
     private boolean stageFailed(ProcessBase process) {
@@ -66,8 +60,8 @@ public class App {
             return runAll(root) ? 0 : -1;
         }
 
-        Optional<List<String>> lines = fileCodeContents(fileName);
         log.debug("File: " + fileName);
+        Optional<List<String>> lines = fileCodeContents(fileName);
         if (!lines.isPresent()) {
             log.error("Failed to read " + fileName);
             return -1;
@@ -164,15 +158,6 @@ public class App {
         return "";
     }
 
-    public static Optional<List<String>> fileContents(String fileName) {
-        try {
-            return Optional.of(Files.readAllLines(Paths.get(fileName)));
-        } catch (IOException e) {
-            log.error(e.getMessage());
-        }
-        return Optional.empty();
-    }
-
     public static Optional<List<String>> fileCodeContents(String fileName) {
         try {
             Path path = Paths.get(fileName);
@@ -182,12 +167,9 @@ public class App {
 
             List<String> code = null;
             if (getFileExtension(path.getFileName().toString()).equals("md")) {
-                StripMarkdown stripped = new StripMarkdown(log, path);
+                MarkdownProcessor stripped = new MarkdownProcessor(log, path);
                 if (stripped.run()) {
                     code = stripped.getCodeText();
-                    FileWriter output = new FileWriter(fileName + ".txt");
-                    log.addLogger(text -> outputWrite(output, text));
-                    logFiles.add(output);
                 }
             }
             else {
@@ -200,16 +182,6 @@ public class App {
         }
 
         return Optional.empty();
-    }
-
-    private static void outputWrite(FileWriter writer, String text) {
-        try {
-            writer.write(text + "\n");
-            writer.flush();
-            System.out.println("wrote " + text);
-        } catch (IOException e) {
-            log.error(e);
-        }
     }
 }
 
