@@ -1,14 +1,18 @@
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
 public class App {
     private static ILogger log;
+    private static List<FileWriter> logFiles = new ArrayList<>();
 
     public static void main(String[] argv) {
         log = new Logger();
@@ -21,8 +25,17 @@ public class App {
             for (StackTraceElement frame : e.getStackTrace()) {
                 log.error(frame.toString());
             }
-            System.exit(-1);
         }
+
+        for (FileWriter writer : logFiles) {
+            try {
+                writer.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        System.exit(-1);
     }
 
     private boolean stageFailed(ProcessBase process) {
@@ -172,6 +185,9 @@ public class App {
                 StripMarkdown stripped = new StripMarkdown(log, path);
                 if (stripped.run()) {
                     code = stripped.getCodeText();
+                    FileWriter output = new FileWriter(fileName + ".txt");
+                    log.addLogger(text -> outputWrite(output, text));
+                    logFiles.add(output);
                 }
             }
             else {
@@ -185,4 +201,15 @@ public class App {
 
         return Optional.empty();
     }
+
+    private static void outputWrite(FileWriter writer, String text) {
+        try {
+            writer.write(text + "\n");
+            writer.flush();
+            System.out.println("wrote " + text);
+        } catch (IOException e) {
+            log.error(e);
+        }
+    }
 }
+

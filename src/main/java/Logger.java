@@ -2,11 +2,14 @@ import java.io.PrintStream;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Logger implements ILogger {
     //private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("mm:ss");
     private static final LocalDateTime startTime = LocalDateTime.now();
+    private final List<IPrinter> chainedLogs = new ArrayList<>();
     private int verbosity = 0;
 
     @Override
@@ -17,6 +20,11 @@ public class Logger implements ILogger {
     @Override
     public int getVerbosity() {
         return verbosity;
+    }
+
+    @Override
+    public void addLogger(IPrinter next) {
+        chainedLogs.add(next);
     }
 
     // use Object and not String as input arguments for all logging methods
@@ -58,7 +66,11 @@ public class Logger implements ILogger {
     }
 
     private void print(PrintStream out, String type, Object text) {
-        //out.println(String.format("%s: %s: %s: %s", timeStamp(), type, getClass().getTypeName(), text));
-        out.println(String.format("%s: %s: %s", timeStamp(), type, text));
+        String output = String.format("%s: %s: %s", timeStamp(), type, text);
+        out.println(output);
+
+        for (IPrinter other : chainedLogs) {
+            other.print(output);
+        }
     }
 }

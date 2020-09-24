@@ -1,6 +1,5 @@
-import java.io.IOException;
-
 public interface ILogger {
+    void addLogger(IPrinter chain);
     void debug(Object text);
     void warn(Object text);
     void info(Object text);
