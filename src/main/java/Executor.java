@@ -280,7 +280,8 @@ public class Executor extends ProcessBase {
 
     private boolean doPrint() {
         Object obj = dataPop();
-        log.info(obj.getClass().getSimpleName() + "=" + obj.toString());
+        ///log.info(obj.getClass().getSimpleName() + "=" + obj.toString());
+        log.info(obj.toString());
         return true;
     }
 

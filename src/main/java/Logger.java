@@ -1,14 +1,11 @@
 import java.io.PrintStream;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
 public class Logger implements ILogger {
-    //private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("mm:ss");
     private static final LocalDateTime startTime = LocalDateTime.now();
     private final List<ILogSink> chainedLogs = new ArrayList<>();
     private EnumSet<ELogLevel> logLevels = EnumSet.allOf(ELogLevel.class);
@@ -82,11 +79,11 @@ public class Logger implements ILogger {
         long secs = since.getSeconds();
         long mins = secs / 60;
         long millis = since.toMillis();
-        return String.format("%2s:%2s:%3s", mins, secs, millis);
+        return String.format("%02d:%02d:%03d", mins, secs, millis);
     }
 
     private void print(PrintStream out, ELogLevel type, Object text) {
-        String output = String.format("%s: %s: %s", timeStamp(), type, text);
+        String output = String.format("%s: %7s: %s", timeStamp(), type, text);
         if (logLevels.contains(type)) {
             out.println(output);
         }

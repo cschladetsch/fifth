@@ -1,16 +1,12 @@
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 public class App {
     private static ILogger log;
-    private static List<MarkdownProcessor> logFiles = new ArrayList<>();
+    private static List<CodeSource> logFiles = new ArrayList<>();
 
     public static void main(String[] argv) {
         log = new Logger();
@@ -61,7 +57,7 @@ public class App {
         }
 
         log.debug("File: " + fileName);
-        MarkdownProcessor processor = new MarkdownProcessor(log, Paths.get(fileName));
+        CodeSource processor = new CodeSource(log, Paths.get(fileName));
         processor.run();
         Lexer lexer = new Lexer(log, processor.getCodeText());
         if (stageFailed(lexer)) {

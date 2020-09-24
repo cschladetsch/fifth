@@ -4,16 +4,15 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
-// TODO: Use for all files, not just Markdown.
-public class MarkdownProcessor extends ProcessBase implements ILogSink {
-    private List<String> code = new ArrayList<>();
+public class CodeSource extends ProcessBase implements ILogSink {
     private final Path path;
-    private EnumSet<ELogLevel> logLevels = EnumSet.allOf(ELogLevel.class);
+    private List<String> code = new ArrayList<>();
     private List<String> text = new ArrayList<>();
+    private EnumSet<ELogLevel> logLevels = EnumSet.allOf(ELogLevel.class);
     private FileWriter fileWriter;
     private String extension;
 
-    public MarkdownProcessor(ILogger logger, Path path) {
+    public CodeSource(ILogger logger, Path path) {
         super(logger);
         this.path = path;
     }
