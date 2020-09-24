@@ -26,7 +26,7 @@ See an example of Literate Programming with [fifth-lang using Markdown](scripts/
 ## Documentation
 The [root](Doc/Readme.md) of the language documentation is fully fledged out and very coherent.
 
-## Example [Script](scripts/TestContinuations.f)
+## Example [Script](scripts/TestContinuation.f)
 This will all look like nonsense at first. But, it can actually be executed live from this Readme.md file.
 See above section for details.
 
