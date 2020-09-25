@@ -8,13 +8,18 @@ public class Executor extends ProcessBase {
     private final Stack<Continuation> context = new Stack<>();
     private final Stack<Object> data = new Stack<>();
     private final float FLOAT_EPSILON = 0.00000001f;
-    private Continuation continuation;
-    private boolean breakFlow;
     private final boolean showTypesInPrint = false;
+    private Continuation continuation;
     private boolean exitProcess;
+    private boolean breakFlow;
 
     public Executor(ILogger logger) {
         super(logger);
+    }
+
+    public Executor(ILogger logger, Continuation continuation) {
+        super(logger);
+        run(continuation);
     }
 
     @Override
@@ -29,7 +34,6 @@ public class Executor extends ProcessBase {
 
     @Override
     boolean run() {
-        reset();
         contextPop().ifPresent(this::process);
         return !hasFailed();
     }
@@ -140,20 +144,20 @@ public class Executor extends ProcessBase {
     }
 
     private boolean doIfElse() {
-        if (!dataPopTrue())
+        if (dataPopEvalFalse())
             doSwap();
         dataPop();
         return true;
     }
 
     private boolean doIf() {
-        if (!dataPopTrue())
+        if (dataPopEvalFalse())
             dataPop();
         return true;
     }
 
-    private boolean dataPopTrue() {
-        return trueEval(dataPop());
+    private boolean dataPopEvalFalse() {
+        return !trueEval(dataPop());
     }
 
     private boolean doErase() {
@@ -557,11 +561,10 @@ public class Executor extends ProcessBase {
         switch (operation) {
             case Assert: {
                 if (!trueEval(dataPop())) {
-                    //fail("FAILED");
-                    return false;
+                    return fail("Failed");
                 }
 
-                log.debug("Passed.");
+                log.debug("Passed");
                 return true;
             }
 

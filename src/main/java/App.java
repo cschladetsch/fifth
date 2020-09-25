@@ -72,45 +72,10 @@ public class App {
         CodeSource processor = new CodeSource(log, Paths.get(fileName));
         log.debug("File: " + fileName);
         processor.run();
-        Lexer lexer = new Lexer(log, processor.getCodeText());
-        if (stageFailed(lexer)) {
-            log.warn(lexer);
-            processor.close();
-            return -1;
+        PiExecutionContext context = new PiExecutionContext(log, processor.getCodeText());
+        if (!context.run()) {
+            log.verbose(10, context);
         }
-
-        Parser parser = new Parser(lexer);
-        if (stageFailed(parser)) {
-            log.warn(lexer);
-            log.warn(parser);
-            processor.close();
-            return -1;
-        }
-
-        Translator translator = new Translator(parser);
-        if (stageFailed(translator)) {
-            log.warn(lexer);
-            log.warn(parser);
-            log.warn(translator);
-            processor.close();
-            return -1;
-        }
-
-        Executor executor = new Executor(log);
-        executor.contextPush(translator.getContinuation());
-        if (stageFailed(executor)) {
-            log.warn(lexer);
-            log.warn(parser);
-            log.warn(translator);
-            log.warn(executor);
-            processor.close();
-            return -1;
-        }
-
-        log.verbose(10, lexer);
-        log.verbose(10, parser);
-        log.verbose(10, translator);
-        log.verbose(10, executor);
 
         processor.close();
         return 0;

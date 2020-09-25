@@ -1,11 +1,15 @@
 import java.util.*;
 
 public class Lexer extends ProcessBase {
-    private final List<String> lines;
     private final List<Token> tokens = new ArrayList<>();
-    private final Map<String, ETokenType> tokenNames = new HashMap<String, ETokenType>();
+    private static final Map<String, ETokenType> tokenNames = new HashMap<String, ETokenType>();
+    private List<String> lines;
     private int lineNumber;
     private int offset;
+
+    public Lexer(ILogger logger) {
+        super(logger);
+    }
 
     public Lexer(ILogger logger, String line) {
         this(logger, makeLines(line));
@@ -15,6 +19,27 @@ public class Lexer extends ProcessBase {
         super(logger);
         this.lines = lines;
         addKeywords();
+    }
+
+    @Override
+    public String toString() {
+        return "Lexer{" +
+                tokens +
+                ", lineNumber=" + lineNumber +
+                ", offset=" + offset +
+                '}';
+    }
+
+    @Override
+    protected boolean fail(String text) {
+        String prefix = String.format("@:%d:%d: ", lineNumber, offset);
+        return super.fail(prefix + text);
+    }
+
+    public void reset() {
+        lineNumber = 0;
+        offset = 0;
+        lines.clear();
     }
 
     private static List<String> makeLines(String line) {
@@ -44,21 +69,6 @@ public class Lexer extends ProcessBase {
         tokenNames.put("for", ETokenType.For);
         tokenNames.put("exit", ETokenType.Exit);
         tokenNames.put("showStack", ETokenType.ShowStack);
-    }
-
-    @Override
-    public String toString() {
-        return "Lexer{" +
-                tokens +
-                ", lineNumber=" + lineNumber +
-                ", offset=" + offset +
-                '}';
-    }
-
-    @Override
-    protected boolean fail(String text) {
-        String prefix = String.format("@:%d:%d: ", lineNumber, offset);
-        return super.fail(prefix + text);
     }
 
     public Optional<String> getText(StringSplice splice) {
@@ -102,6 +112,11 @@ public class Lexer extends ProcessBase {
 
     public Optional<String> getLocation() {
         return getText(new StringSplice(lineNumber, offset, 1));
+    }
+
+    public boolean run(List<String> lines) {
+        this.lines = lines;
+        return run();
     }
 
     public boolean run() {

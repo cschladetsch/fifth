@@ -7,6 +7,8 @@ public abstract class ProcessBase {
         this.log = logger;
     }
 
+    abstract boolean run();
+
     @Override
     public String toString() {
         return "ProcessBase{" +
@@ -34,10 +36,8 @@ public abstract class ProcessBase {
         return fail("Not implemented " + what);
     }
 
-    public void reset() {
+    protected void baseReset() {
         failed = false;
         text = "";
     }
-
-    abstract boolean run();
 }
