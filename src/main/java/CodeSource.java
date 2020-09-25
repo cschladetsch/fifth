@@ -15,6 +15,7 @@ public class CodeSource extends ProcessBase implements ILogSink {
     public CodeSource(ILogger logger, Path path) {
         super(logger);
         this.path = path;
+        logLevels.remove(ELogLevel.StackTrace);
     }
 
     @Override

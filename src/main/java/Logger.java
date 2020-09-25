@@ -94,6 +94,7 @@ public class Logger implements ILogger {
 
         StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
         for (ILogSink other : chainedLogs) {
+            other.print(type, output);
             if (other.contains(ELogLevel.StackTrace)) {
                 for (StackTraceElement st : stackTrace) {
                     other.print(type, st.toString());
