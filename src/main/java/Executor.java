@@ -4,7 +4,7 @@ import java.util.Optional;
 import java.util.Stack;
 
 public class Executor extends ProcessBase {
-    private final Map<String, Object> globals = new HashMap<String, Object>();
+    private final Map<String, Object> globals = new HashMap<>();
     private final Stack<Continuation> context = new Stack<>();
     private final Stack<Object> data = new Stack<>();
     private final float FLOAT_EPSILON = 0.00000001f;
@@ -28,11 +28,9 @@ public class Executor extends ProcessBase {
 
     @Override
     boolean run() {
-        if (context.empty()) {
-            return false;
-        }
-
-        return process(contextPop().get());
+        reset();
+        contextPop().ifPresent(this::run);
+        return !hasFailed();
     }
 
     public boolean run(Continuation continuation) {

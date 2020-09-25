@@ -23,7 +23,7 @@ public class Lexer extends ProcessBase {
         return lines;
     }
 
-    private void addKeywords() {
+    protected void addKeywords() {
         tokenNames.put("assert", ETokenType.Assert);
         tokenNames.put("break", ETokenType.Break);
         tokenNames.put("dup", ETokenType.Dup);
