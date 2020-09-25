@@ -2,7 +2,6 @@ import java.util.List;
 
 public class PiExecutionContext extends ProcessBase {
     private Lexer lexer;
-    private List<String> piCode;
 
     public PiExecutionContext(ILogger log) {
         super(log);
@@ -15,19 +14,14 @@ public class PiExecutionContext extends ProcessBase {
 
     public boolean run(List<String> piCode) {
         reset();
-        this.piCode = piCode;
-        return run();
+        return lexer.run(piCode) && run();
     }
 
     @Override
     boolean run() {
-        if (piCode.isEmpty()) {
-            return true;
-        }
-
         boolean showProcess = false;
 
-        if (!lexer.run(piCode)) {
+        if (!lexer.run()) {
             if (showProcess) {
                 log.error(lexer);
             }
