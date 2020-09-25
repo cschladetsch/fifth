@@ -36,6 +36,11 @@ public class CodeSource extends ProcessBase implements ILogSink {
     }
 
     @Override
+    public boolean contains(ELogLevel logLevel) {
+        return logLevels.contains(logLevel);
+    }
+
+    @Override
     public void print(ELogLevel level, String text) {
         if (logLevels.contains(level)) {
             FileUtil.println(fileWriter, text);

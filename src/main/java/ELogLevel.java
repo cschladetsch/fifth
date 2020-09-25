@@ -4,5 +4,6 @@ public enum ELogLevel {
     Info,
     Warn,
     Error,
+    StackTrace,
     Verbose
 }
