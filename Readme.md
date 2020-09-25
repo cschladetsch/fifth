@@ -13,7 +13,7 @@ Note that, like Forth, *pi* uses *reverse polish notation*. If you've only used 
 a = b*2 + c
 ```
 would be expressed as:
-```f
+```pi
 2 b * c + 'a =
 ```
 
