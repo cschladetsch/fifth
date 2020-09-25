@@ -16,7 +16,7 @@ In either case, a new file with the same name but with an appended `txt` extensi
 
 ## Live Example
 The following is a code-block with type *f* (e.g. **\`\`\`f**)
-```f
+```pi
 # Trace a string to the info log stream
 "Hello, Markdown!" print
 

@@ -1,0 +1,30 @@
+{
+  "options" : {
+    "executor" : {
+      "printTypes" : true
+    },
+    "logLevels": [
+      "all"
+    ],
+    "logVerbosity" : 5,
+    "runTests" : true,
+    "runTestsQuiet" : true
+  },
+
+  "tests": {
+    "categories" : {
+      "alpha": [
+        "scripts/alpha/TestExit.md"
+      ],
+      "beta": [
+      ],
+      "tests": [
+      ],
+      "all" : [
+        "scripts"
+      ]
+    },
+
+    "toRun" : "all"
+  }
+}

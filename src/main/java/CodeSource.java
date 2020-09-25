@@ -21,7 +21,7 @@ public class CodeSource extends ProcessBase implements ILogSink {
     boolean run() {
         String pathName = path.toAbsolutePath().toString();
         extension = FileUtil.getFileExtension(pathName);
-        if (!extension.equals("md") && !extension.equals("f"))
+        if (!(extension.equals("md") || extension.equals("pi")))
             return false;
 
         FileUtil.newWriter(pathName + ".txt").ifPresent(f -> fileWriter = f);
@@ -54,10 +54,9 @@ public class CodeSource extends ProcessBase implements ILogSink {
 
     private void gatherCode(List<String> text) {
         this.text = text;
-        String fileName = path.getFileName().toString();
         if (extension.equals("md")) {
             readMarkdownContents();
-        } else if (extension.equals("f")) {
+        } else if (extension.equals("pi")) {
             code = text;
         }
     }
@@ -66,15 +65,15 @@ public class CodeSource extends ProcessBase implements ILogSink {
         int lineNumber = 0;
         while (lineNumber < text.size()) {
             String line = text.get(lineNumber);
-            if (line.trim().startsWith("```f")) {
-                lineNumber = readCodeLines(lineNumber);
+            if (line.trim().startsWith("```pi")) {
+                lineNumber = readMarkdownCodeLines(lineNumber);
             } else {
                 ++lineNumber;
             }
         }
     }
 
-    private int readCodeLines(int lineNumber) {
+    private int readMarkdownCodeLines(int lineNumber) {
         ++lineNumber;
         while (lineNumber < text.size()) {
             String line = text.get(lineNumber++);

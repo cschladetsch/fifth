@@ -1,13 +1,13 @@
 # Test Conditionals
 
 ## Test basic assertions and negation
-```f
+```pi
 true assert
 false not assert
 ```
 
 ## Test if
-```f
+```pi
 2 true if
 2 == assert
 depth 0 == assert
@@ -22,7 +22,7 @@ depth 0 == assert
 
 ## Test if-else
 
-```f
+```pi
 1 2 true ifElse
 1 == assert
 depth 0 == assert
@@ -33,7 +33,7 @@ depth 0 == assert
 ```
 
 TODO: move tests to a better spot
-```f
+```pi
 { 2 + 3 * } 'body=
 2 body true if & 12 == assert # test trailing comment
 3 body true if & 15 == assert

@@ -1,12 +1,24 @@
+import net.sf.json.JSONObject;
+import org.apache.commons.lang.StringUtils;
+
 import java.io.File;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 public class App {
     private static ILogger log;
-    private static List<CodeSource> logFiles = new ArrayList<>();
+
+    public App() {
+        FileUtil.contents("config.json").ifPresent(this::parseConfig);
+    }
+
+    private void parseConfig(List<String> jsonText) {
+        String allText = StringUtils.join(jsonText, "");
+        JSONObject json = JSONObject.fromObject(allText);
+        Object tests = json.get("tests");
+        Object options = json.get("options");
+    }
 
     public static void main(String[] argv) {
         log = new Logger();
@@ -20,6 +32,7 @@ public class App {
             for (StackTraceElement frame : e.getStackTrace()) {
                 log.error(frame.toString());
             }
+
             result = -1;
         }
 
@@ -146,13 +159,5 @@ public class App {
             }
         }
     }
-//    public static Optional<List<String>> fileCodeContents(String fileName) {
-//        Path path = Paths.get(fileName);
-//        if (!Files.exists(path)) {
-//            return Optional.empty();
-//        }
-//
-//        return = new MarkdownProcessor(log, path);
-//    }
 }
 

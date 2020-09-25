@@ -29,7 +29,7 @@ public class Executor extends ProcessBase {
     @Override
     boolean run() {
         reset();
-        contextPop().ifPresent(this::run);
+        contextPop().ifPresent(this::process);
         return !hasFailed();
     }
 

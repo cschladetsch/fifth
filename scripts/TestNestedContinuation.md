@@ -2,7 +2,7 @@
 A [continuation](https://en.wikipedia.org/wiki/Continuation) is just a block of code that can be interrupted and perhaps returned to.
 
 ## Example
-```f
+```pi
 {+}'a=          # make a continuatoin that just adds the two things on the stack, and call it 'a'
 {*}'b=          # same for multiplication
 { a& b& } 'c=   # combine the two can call it 'c'

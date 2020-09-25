@@ -3,7 +3,7 @@ Test basic arithmetic like plus, minus, multiply, divide operations.
 
 Also, uses dup, print, assert, logical not. Really should be broken down into separate tests.
 
-```f
+```pi
 1 drop # test trailing comments
 2 2 * 4 == assert
 6 2 / 3 == assert
