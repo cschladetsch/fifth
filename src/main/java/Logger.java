@@ -11,14 +11,18 @@ public class Logger implements ILogger {
     private EnumSet<ELogLevel> logLevels = EnumSet.allOf(ELogLevel.class);
     private int verbosity = 0;
 
-    @Override
-    public void setVerbosity(int verbosity) {
-        this.verbosity = verbosity;
+    public Logger() {
+        logLevels.remove(ELogLevel.StackTrace);
     }
 
     @Override
     public int getVerbosity() {
         return verbosity;
+    }
+
+    @Override
+    public void setVerbosity(int verbosity) {
+        this.verbosity = verbosity;
     }
 
     @Override
@@ -88,8 +92,19 @@ public class Logger implements ILogger {
             out.println(output);
         }
 
+        StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
         for (ILogSink other : chainedLogs) {
-            other.print(type, output);
+            if (other.contains(ELogLevel.StackTrace)) {
+                for (StackTraceElement st : stackTrace) {
+                    other.print(type, st.toString());
+                }
+            }
+        }
+
+        if (logLevels.contains(ELogLevel.StackTrace)) {
+            for (StackTraceElement st : stackTrace) {
+                out.println(st);
+            }
         }
     }
 }

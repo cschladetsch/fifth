@@ -69,8 +69,8 @@ public class App {
             return runAll(root) ? 0 : -1;
         }
 
-        log.debug("File: " + fileName);
         CodeSource processor = new CodeSource(log, Paths.get(fileName));
+        log.debug("File: " + fileName);
         processor.run();
         Lexer lexer = new Lexer(log, processor.getCodeText());
         if (stageFailed(lexer)) {

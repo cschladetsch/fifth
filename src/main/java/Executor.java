@@ -11,6 +11,7 @@ public class Executor extends ProcessBase {
     private Continuation continuation;
     private boolean breakFlow;
     private final boolean showTypesInPrint = false;
+    private boolean exitProcess;
 
     public Executor(ILogger logger) {
         super(logger);
@@ -105,6 +106,8 @@ public class Executor extends ProcessBase {
                 return dataPush(true);
             case False:
                 return dataPush(false);
+            case Exit:
+                return exitProcess = true;
             case ShowStack:
                 return doShowStack();
             default:
@@ -355,6 +358,10 @@ public class Executor extends ProcessBase {
             while (next != null) {
                 if (!execute(next) || hasFailed()) {
                     return hasFailed() || fail("Failed to continue " + current + " at object " + current.getCurrent());
+                }
+
+                if (exitProcess) {
+                    return true;
                 }
 
                 if (breakFlow) {
