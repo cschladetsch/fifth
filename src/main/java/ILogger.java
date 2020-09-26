@@ -2,6 +2,8 @@ import java.util.EnumSet;
 
 public interface ILogger {
     void setOutputs(EnumSet<ELogLevel> logLevels);
+    void setOutputMarkDown(boolean useMarkDown);
+    boolean getOutputMarkDown();
     void addLogger(ILogSink chain);
     void debug(Object text);
     void warn(Object text);

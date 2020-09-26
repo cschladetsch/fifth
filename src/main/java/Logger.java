@@ -10,6 +10,7 @@ public class Logger implements ILogger {
     private final List<ILogSink> chainedLogs = new ArrayList<>();
     private EnumSet<ELogLevel> logLevels = EnumSet.allOf(ELogLevel.class);
     private int verbosity = 0;
+    private boolean outputMarkdown = true;
 
     public Logger() {
         logLevels.remove(ELogLevel.StackTrace);
@@ -40,6 +41,15 @@ public class Logger implements ILogger {
     @Override
     public void setOutputs(EnumSet<ELogLevel> logLevels) {
         this.logLevels = logLevels;
+    }
+
+    @Override
+    public void setOutputMarkDown(boolean useMarkDown) {
+        outputMarkdown = useMarkDown;
+    }
+
+    public boolean getOutputMarkDown() {
+        return outputMarkdown;
     }
 
     @Override
@@ -87,7 +97,7 @@ public class Logger implements ILogger {
     }
 
     private void print(PrintStream out, ELogLevel type, Object text) {
-        String output = String.format("%s: %7s: %s", timeStamp(), type, text);
+        String output = String.format("%s: %7s: **%s**", timeStamp(), "*" + type + "*", text);
         if (logLevels.contains(type)) {
             out.println(output);
         }

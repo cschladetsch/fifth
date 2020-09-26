@@ -25,7 +25,8 @@ public class CodeSource extends ProcessBase implements ILogSink {
         if (!(extension.equals("md") || extension.equals("pi")))
             return false;
 
-        FileUtil.newWriter(pathName + ".txt").ifPresent(f -> fileWriter = f);
+        String newExtension = log.getOutputMarkDown() ? ".md" : ".txt";
+        FileUtil.newWriter(pathName + newExtension).ifPresent(f -> fileWriter = f);
         FileUtil.contents(pathName).ifPresent(this::gatherCode);
         log.addLogger(this);
         return true;
