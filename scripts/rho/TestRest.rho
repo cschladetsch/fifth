@@ -1,0 +1,19 @@
+request = get(${host} + "/status", 500ms)
+    .then(log.info)
+    .timedOut(req -> tryAgain(req, 1s))
+    .error(log.error)
+
+person = post($host + "/newuser",
+    {
+        "name" : "fred",
+        "number" : 456
+    })
+    .else("Failed to post")
+
+result = send(${host}, "1+2")
+    .then(r -> assert(r == 3))
+    .timedOut(retry)
+    .error(log.error)
+
+
+
