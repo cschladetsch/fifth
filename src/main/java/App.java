@@ -11,12 +11,16 @@ public class App {
     private Object tests;
     private Object options;
 
+    public App() {
+        FileUtil.contents("config.json").ifPresent(this::parseConfig);
+    }
+
     public static void main(String[] argv) {
         log = new Logger();
         log.info("fifth-sys v0.1");
         log.setVerbosity(0);
 
-        int result = 0;
+        int result;
         try {
             result = new App().run(argv);
         } catch (Exception e) {
@@ -31,10 +35,6 @@ public class App {
         log.close();
 
         System.exit(result);
-    }
-
-    public App() {
-        FileUtil.contents("config.json").ifPresent(this::parseConfig);
     }
 
     private void parseConfig(List<String> jsonText) {
@@ -60,27 +60,39 @@ public class App {
             return runAll(root);
         }
 
-        CodeSource processor = new CodeSource(log, Paths.get(fileName));
-        log.debug("File: " + fileName);
-        processor.run();
-        PiExecutionContext context = new PiExecutionContext(log, processor.getCodeText());
+        String extension = FileUtil.getFileExtension(fileName);
+        if (!extension.equals("pi") && !extension.equals("md")) {
+            return true;
+        }
+
+        CodeSource codeSource = new CodeSource(log, Paths.get(fileName));
+        log.info("File: " + fileName);
+        codeSource.run();
+        if (codeSource.hasFailed()) {
+            log.error("Couldn't read from " + fileName);
+            return false;
+        }
+
+        PiExecutionContext context = new PiExecutionContext(log, codeSource.getCodeText());
         if (!context.run()) {
+            log.info("Failed");
             log.debug(context);
         }
 
-        processor.close();
+        codeSource.close();
         return true;
     }
 
     private boolean runAll(File root) {
+        boolean success = true;
         for (File file : Objects.requireNonNull(root.listFiles())) {
             if (file.isFile()) {
                 if (!run(file.getAbsolutePath())) {
-                    return false;
+                    success = false;
                 }
             }
         }
 
-        return true;
+        return success;
     }
 }

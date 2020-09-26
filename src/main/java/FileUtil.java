@@ -10,7 +10,7 @@ public class FileUtil {
     public static String getFileExtension(String fileName) {
         int dotIndex = fileName.lastIndexOf(".");
         if (dotIndex != -1 && dotIndex != 0) {
-            return fileName.substring(fileName.lastIndexOf(".") + 1);
+            return fileName.substring(dotIndex + 1);
         }
 
         return "";

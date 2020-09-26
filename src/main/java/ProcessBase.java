@@ -1,7 +1,7 @@
 public abstract class ProcessBase {
     protected ILogger log = null;
-    private boolean failed = false;
-    private String text = "";
+    protected boolean failed = false;
+    protected String text = "";
 
     protected ProcessBase(ILogger logger) {
         this.log = logger;
@@ -17,15 +17,19 @@ public abstract class ProcessBase {
                 '}';
     }
 
-    protected boolean fail(String text) {
+    protected boolean fail(Object object) {
         failed = true;
-        this.text = text;
+        text = object.toString();
         log.error(text);
         return false;
     }
 
     public boolean hasFailed() {
         return failed;
+    }
+
+    public String getErrorText() {
+        return text;
     }
 
     protected boolean notImplemented() {

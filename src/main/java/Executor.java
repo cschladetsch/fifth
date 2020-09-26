@@ -39,8 +39,7 @@ public class Executor extends ProcessBase {
     }
 
     public boolean run(Continuation continuation) {
-        dataPush(continuation);
-        return execute(ETokenType.Replace);
+        return process(continuation);
     }
 
     private boolean execute(Object object) {

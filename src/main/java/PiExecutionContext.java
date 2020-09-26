@@ -10,6 +10,9 @@ public class PiExecutionContext extends ProcessBase {
     public PiExecutionContext(ILogger log, List<String> piCode) {
         super(log);
         lexer = new Lexer(log, piCode);
+        if (!lexer.run()) {
+            fail(lexer);
+        }
     }
 
     public boolean run(List<String> piCode) {
@@ -19,12 +22,19 @@ public class PiExecutionContext extends ProcessBase {
 
     @Override
     boolean run() {
-        boolean showProcess = false;
+        if (lexer.hasFailed()) {
+            fail(lexer.getErrorText());
+            lexer.reset();
+            return false;
+        }
+
+        boolean showProcess = true;
 
         if (!lexer.run()) {
             if (showProcess) {
                 log.error(lexer);
             }
+
             return false;
         }
 
@@ -33,6 +43,7 @@ public class PiExecutionContext extends ProcessBase {
             if (showProcess) {
                 log.error(parser);
             }
+
             return false;
         }
 
@@ -41,14 +52,16 @@ public class PiExecutionContext extends ProcessBase {
             if (showProcess) {
                 log.error(translator);
             }
+
             return false;
         }
 
         Executor executor = new Executor(log, translator.getContinuation());
-        if (!executor.run(translator.getContinuation())) {
+        if (executor.hasFailed()) {
             if (showProcess) {
                 log.error(executor);
             }
+
             return false;
         }
         return true;

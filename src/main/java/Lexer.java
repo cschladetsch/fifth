@@ -31,12 +31,13 @@ public class Lexer extends ProcessBase {
     }
 
     @Override
-    protected boolean fail(String text) {
+    protected boolean fail(Object text) {
         String prefix = String.format("@:%d:%d: ", lineNumber, offset);
         return super.fail(prefix + text);
     }
 
     public void reset() {
+        baseReset();
         lineNumber = 0;
         offset = 0;
         lines.clear();
