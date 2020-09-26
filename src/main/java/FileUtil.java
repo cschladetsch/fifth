@@ -7,6 +7,15 @@ import java.util.Optional;
 
 public class FileUtil {
 
+    public static String getAllFileExtension(String fileName) {
+        int dotIndex = fileName.indexOf(".");
+        if (dotIndex != -1 && dotIndex != 0) {
+            return fileName.substring(dotIndex + 1);
+        }
+
+        return "";
+    }
+
     public static String getFileExtension(String fileName) {
         int dotIndex = fileName.lastIndexOf(".");
         if (dotIndex != -1 && dotIndex != 0) {

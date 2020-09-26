@@ -1,6 +1,8 @@
 import java.io.FileWriter;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -25,10 +27,12 @@ public class CodeSource extends ProcessBase implements ILogSink {
         if (!(extension.equals("md") || extension.equals("pi")))
             return false;
 
-        String newExtension = log.getOutputMarkDown() ? ".md" : ".txt";
+        String newExtension = log.getOutputMarkDown() ? ".out.md" : ".txt";
         FileUtil.newWriter(pathName + newExtension).ifPresent(f -> fileWriter = f);
         FileUtil.contents(pathName).ifPresent(this::gatherCode);
         log.addLogger(this);
+        LocalDateTime localDateTime = LocalDateTime.now();
+        log.info(String.format("Started *%s* on %s", path.getFileName().toString(), new Date().toString()));
         return true;
     }
 

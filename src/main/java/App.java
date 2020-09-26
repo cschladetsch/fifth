@@ -60,9 +60,14 @@ public class App {
             return runAll(root);
         }
 
-        String extension = FileUtil.getFileExtension(fileName);
-        if (!extension.equals("pi") && !extension.equals("md")) {
-            return true;
+        String extension = FileUtil.getAllFileExtension(fileName);
+        switch (extension) {
+            case "pi":
+            case "md":
+                break;
+            case "out.md":
+            default:
+                return true;
         }
 
         CodeSource codeSource = new CodeSource(log, Paths.get(fileName));

@@ -97,7 +97,7 @@ public class Logger implements ILogger {
     }
 
     private void print(PrintStream out, ELogLevel type, Object text) {
-        String output = String.format("%s: %7s: **%s**", timeStamp(), "*" + type + "*", text);
+        String output = String.format("%s: %7s: **%s**  ", timeStamp(), "*" + type + "*", text);
         if (logLevels.contains(type)) {
             out.println(output);
         }
