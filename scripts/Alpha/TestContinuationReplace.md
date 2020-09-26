@@ -17,6 +17,7 @@ infinite tail recursion.
 ## Example 1
 This example shows that the current continuation is *replaced* by the *!* operator, as the assertion is never met:
 ```pi
+"Start" print
 { 123 } 'a=
 a!
 false assert # never reached! current continuation was *replaced* by the contination stored in 'a'
