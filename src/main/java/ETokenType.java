@@ -38,4 +38,7 @@ public enum ETokenType {
     Depth, Clear,
 
     If, IfElse, While, For,
+
+    Size, ToArray, FromArray, At, Set,
+    ForEach,
 }

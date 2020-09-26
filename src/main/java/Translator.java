@@ -29,12 +29,18 @@ public class Translator extends ProcessBase {
             case Value:
             case Token:
                 return node.getValue();
+            case Array:
+                return translateArray(node);
             case Continuation:
                 return translateContinuation(node);
             default:
                 notImplemented(node.toString());
                 return null;
         }
+    }
+
+    private Object translateArray(AstNode node) {
+        return new ArrayList<>(translateChildren(node));
     }
 
     private Continuation translateContinuation(AstNode node) {

@@ -1,7 +1,4 @@
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Stack;
+import java.util.*;
 
 public class Executor extends ProcessBase {
     private final Map<String, Object> globals = new HashMap<>();
@@ -115,11 +112,76 @@ public class Executor extends ProcessBase {
                 return exitProcess = true;
             case ShowStack:
                 return doShowStack();
+            case Size:
+                return doSize();
+            case ToArray:
+                return doToArray();
+            case FromArray:
+                return doFromArray();
+            case At:
+                return doAt();
             default:
                 break;
         }
 
         return fail("Unsupported operation " + token);
+    }
+
+    private boolean doAt() {
+        int index = (int)dataPop();
+        List array = (List)dataPop();
+        return dataPush(array.get(index));
+    }
+
+    private boolean doFromArray() {
+        List array = (List)(dataPop());
+        for (Object item : array) {
+            dataPush(item);
+        }
+
+        return dataPush(array.size());
+    }
+
+    private boolean doToArray() {
+        if (data.empty()) {
+            return fail("Empty stack.");
+        }
+
+        // Dirk: How to ensure popped item is of a given type?
+        int len = (int) dataPop();
+        if (data.size() < len) {
+            return fail("ToArray: Empty Stack");
+        }
+
+        List<Object> array = new ArrayList<>();
+        while (len-- > 0) {
+           array.add(dataPop());
+        }
+        dataPush(array);
+
+        return true;
+    }
+
+    private boolean doSize() {
+        Object container = dataPop();
+
+        if (container instanceof String) {
+            return dataPush(((String)container).length());
+        }
+
+        // Dirk: How to use List rather than ArrayList?
+        if (container instanceof ArrayList) {
+            ArrayList array = (ArrayList)container;
+            return dataPush(array.size());
+        }
+
+        // Dirk: how to generalise maps?
+//        if (container instanceof Map<>)
+//            Map map = (Map)map;
+//            return dataPush(map.size());
+//        }
+
+        return false;
     }
 
     private boolean doResume() {
@@ -553,6 +615,7 @@ public class Executor extends ProcessBase {
         return notImplemented(first.getClass().getTypeName() + " + " + second.getClass().getName());
     }
 
+    // TODO: Optional<Object> dataPop() { .. }
     private Object dataPop() {
         if (data.empty()) {
             fail("Empty data stack.");

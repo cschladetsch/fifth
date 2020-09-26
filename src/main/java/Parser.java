@@ -34,13 +34,14 @@ public class Parser extends ProcessBase {
             case String:
                 return addString(token);
             case OpenParan:
-            case OpenSquareBracket:
             case CloseParan:
-            case CloseSquareBracket:
-                return notImplemented();
             case Whitespace:
             case Comment:
                 return true;
+            case OpenSquareBracket:
+                return newSequence();
+            case CloseSquareBracket:
+                return leaveSequence();
             case OpenBrace:
                 return newContinuation();
             case CloseBrace:
@@ -54,6 +55,14 @@ public class Parser extends ProcessBase {
         }
     }
 
+    private boolean newSequence() {
+        return enterNode(EAstNodeType.Array);
+    }
+
+    private boolean leaveSequence() {
+        return leaveNode();
+    }
+
     private boolean addString(Token token) {
         return addChild(EAstNodeType.Value, token.getText().get());
     }
@@ -63,8 +72,7 @@ public class Parser extends ProcessBase {
             return fail("Parse stack empty.");
         }
 
-        leaveNode();
-        return true;
+        return leaveNode();
     }
 
     private boolean newContinuation() {
@@ -96,12 +104,13 @@ public class Parser extends ProcessBase {
         return false;
     }
 
-    private void enterNode(EAstNodeType type) {
+    private boolean enterNode(EAstNodeType type) {
         AstNode node = new AstNode(type);
         stack.push(node);
+        return true;
     }
 
-    private void leaveNode() {
+    private boolean leaveNode() {
         if (stack.empty()) {
             fail("Empty Parser context stack");
             throw new IllegalStateException("Parser");
@@ -109,6 +118,7 @@ public class Parser extends ProcessBase {
 
         AstNode inner = stack.pop();
         current().addChild(inner);
+        return true;
     }
 
     private AstNode current() {

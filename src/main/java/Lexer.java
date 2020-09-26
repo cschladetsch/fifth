@@ -70,6 +70,10 @@ public class Lexer extends ProcessBase {
         tokenNames.put("for", ETokenType.For);
         tokenNames.put("exit", ETokenType.Exit);
         tokenNames.put("showStack", ETokenType.ShowStack);
+        tokenNames.put("size", ETokenType.Size);
+        tokenNames.put("toArray", ETokenType.ToArray);
+        tokenNames.put("expand", ETokenType.FromArray);
+        tokenNames.put("forEach", ETokenType.ForEach);
     }
 
     public Optional<String> getText(StringSplice splice) {
@@ -251,6 +255,10 @@ public class Lexer extends ProcessBase {
                 return addLess();
             case '>':
                 return addGreater();
+            case '[':
+                return addToken(ETokenType.OpenSquareBracket, 1);
+            case ']':
+                return addToken(ETokenType.CloseSquareBracket, 1);
             case '=':
                 return addEqual();
             default:
