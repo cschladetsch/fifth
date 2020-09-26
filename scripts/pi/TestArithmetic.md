@@ -1,7 +1,9 @@
-# Test arithmetic
+# Test Arithmetic
 Test basic arithmetic like plus, minus, multiply, divide operations.
 
-Also, uses dup, print, assert, logical not. Really should be broken down into separate tests.
+Also, uses dup, print, assert, logical not.  
+
+Really should be broken down into separate tests.
 
 ```pi
 1 drop # test trailing comments

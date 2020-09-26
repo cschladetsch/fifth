@@ -246,35 +246,42 @@ public class Lexer extends ProcessBase {
             case '\'':
                 return addQuotedIdent();
             case '.':
-                if (peek('.')) {
-                    offset++;
-                    if (peek('.')) {
-                        return addToken(ETokenType.Resume, 3);
-                    }
-                    offset--;
-                    break;
-                }
-            case '<': {
-                if (peek('=')) {
-                    return addToken(ETokenType.LessEqual, 2);
-                }
-                return addToken(ETokenType.Less, 1);
-            }
-            case '>': {
-                if (peek('=')) {
-                    return addToken(ETokenType.GreaterEqual, 2);
-                }
-                return addToken(ETokenType.Greater, 1);
-            }
-            case '=': {
-                if (peek('=')) {
-                    return addToken(ETokenType.Equiv, 2);
-                }
-                return addToken(ETokenType.Store, 1);
-            }
+                return addDots();
+            case '<':
+                return addLess();
+            case '>':
+                return addGreater();
+            case '=':
+                return addEqual();
+            default:
+                break;
         }
 
         fail("Unrecognised operator starting with '" + ch + "'");
+        return false;
+    }
+
+    private boolean addEqual() {
+        return peek('=') ? addToken(ETokenType.Equiv, 2) : addToken(ETokenType.Store, 1);
+    }
+
+    private boolean addGreater() {
+        return peek('=') ? addToken(ETokenType.GreaterEqual, 2) : addToken(ETokenType.Greater, 1);
+    }
+
+    private boolean addLess() {
+        return peek('=') ? addToken(ETokenType.LessEqual, 2) : addToken(ETokenType.Less, 1);
+    }
+
+    private boolean addDots() {
+        if (peek('.')) {
+            offset++;
+            if (peek('.')) {
+                return addToken(ETokenType.Resume, 3);
+            }
+            offset--;
+        }
+
         return false;
     }
 
