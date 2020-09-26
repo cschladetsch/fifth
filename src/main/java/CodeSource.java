@@ -32,7 +32,8 @@ public class CodeSource extends ProcessBase implements ILogSink {
         FileUtil.contents(pathName).ifPresent(this::gatherCode);
         log.addLogger(this);
         LocalDateTime localDateTime = LocalDateTime.now();
-        log.info(String.format("Started *%s* on %s", path.getFileName().toString(), new Date().toString()));
+        String fileName = path.getFileName().toString();
+        log.info(String.format("Started [%s](%s) on %s", fileName, fileName, new Date().toString()));
         return true;
     }
 

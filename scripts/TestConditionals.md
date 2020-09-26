@@ -1,26 +1,48 @@
 # Test Conditionals
 
-## Test basic assertions and negation
+This file shows the use of the `if` and `ifElse` operations in *pi*.
+
+This file can be executed by the Fifth environment.
+
+## Test `assert`
+### Stack Diagram
+```
+X assert # program continues if X evaluates to true
+X assert # program ends if X evaluates to false
+```
+
+### Executable Example
+
+Note that `true` and `false` are keywords.
+
 ```pi
 true assert
 false not assert
+1 1 == assert
+1 2 == not assert
 ```
 
-## Test if
+## Test `if`
+### Stack Diagram
+```
+X test if -> X # if test is true
+X test if ->   # if test is not true
+```
+
+### Executable Example
+
 ```pi
-2 true if
-2 == assert
-depth 0 == assert
-
-1 true if
-1 == assert
-depth 0 == assert
-
-1 false if
-depth 0 == assert
+1 true if 1 == assert
+1 false if depth 0 == assert
 ```
 
-## Test if-else
+## Test `ifElse`
+### Stack Diagram
+```X test if -> X # if test is true
+X Y test ifElse -> X # if test is true
+X Y test ifElse -> Y # if test is not true
+```
+### Executable Example
 
 ```pi
 1 2 true ifElse
@@ -32,7 +54,7 @@ depth 0 == assert
 depth 0 == assert
 ```
 
-TODO: move tests to a better spot
+## More elaborate example
 ```pi
 { 2 + 3 * } 'body=
 2 body true if & 12 == assert # test trailing comment

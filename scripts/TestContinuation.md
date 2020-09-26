@@ -1,10 +1,13 @@
-#
-# Test basic continuations
-#
-# Make a 'function' that just returns 1
-{1} 'a= a& 1 == assert
+# Test Continuations
+A [Continuation](https://en.wikipedia.org/wiki/Continuation) represents 'the rest of the program'.
 
-# Make a function that adds whatever two things are on the stack
+## Make a 'function' that just returns 1
+```pi
+{1} 'a= a& 1 == assert
+```
+
+## Example
+```pi
 {+} 'b=
 a& 2 b& 3 == assert
 
@@ -21,3 +24,4 @@ a& 2 b& 3 == assert
 
 depth 0 == assert
 "Done" print
+```
