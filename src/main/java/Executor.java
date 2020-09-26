@@ -78,6 +78,8 @@ public class Executor extends ProcessBase {
                 return doSuspend();
             case Replace:
                 return doReplace();
+            case Resume:
+                return doResume();
             case Not:
                 return doNot();
             case Dump:
@@ -118,6 +120,10 @@ public class Executor extends ProcessBase {
         }
 
         return fail("Unsupported operation " + token);
+    }
+
+    private boolean doResume() {
+        return breakFlow = true;
     }
 
     public String createStackString() {

@@ -245,6 +245,15 @@ public class Lexer extends ProcessBase {
                 return addToken(ETokenType.Suspend, 1);
             case '\'':
                 return addQuotedIdent();
+            case '.':
+                if (peek('.')) {
+                    offset++;
+                    if (peek('.')) {
+                        return addToken(ETokenType.Resume, 3);
+                    }
+                    offset--;
+                    break;
+                }
             case '<': {
                 if (peek('=')) {
                     return addToken(ETokenType.LessEqual, 2);
@@ -263,11 +272,9 @@ public class Lexer extends ProcessBase {
                 }
                 return addToken(ETokenType.Store, 1);
             }
-            default:
-                fail("Unrecognised operator starting with '" + ch + "'");
-                break;
         }
 
+        fail("Unrecognised operator starting with '" + ch + "'");
         return false;
     }
 

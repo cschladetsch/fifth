@@ -25,3 +25,12 @@ a& 2 b& 3 == assert
 depth 0 == assert
 "Done" print
 ```
+
+## Test Resume
+TODO: currently fails
+```
+{ 1 ... 2 3 } 'a=
+a&
+1 depth == assert
+"Done resume" print
+```
