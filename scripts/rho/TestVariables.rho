@@ -1,0 +1,9 @@
+a = 1
+assert(a == 1)
+
+b = 2
+assert(a + b == 3)
+
+h = "Hello"
+w = ", World"
+assert(h + w == "Hello, World")

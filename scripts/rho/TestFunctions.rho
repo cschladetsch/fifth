@@ -1,0 +1,11 @@
+fun f0()
+    print("Hello")
+
+f0()
+
+fun f1(n)
+    return n+1
+
+assert(F(1) == 2)
+
+

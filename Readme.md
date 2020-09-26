@@ -20,7 +20,7 @@ would be expressed as:
 See sample [scripts](/scripts). Note that MarkDown files are also executable *fifth-lang* files.
 
 ## Executable Markdown
-See an example of Literate Programming with [fifth-lang using Markdown](scripts/TestMarkDown.md)
+See an example of Literate Programming with [fifth-lang using Markdown](scripts/pi/TestMarkDown.md)
 
 ## Todo
 Re-organise project structure into multiple modules:
