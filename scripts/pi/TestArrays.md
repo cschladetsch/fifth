@@ -6,7 +6,7 @@ Arrays are simply sequences of objects. They can be indexed to obtain an element
 
 [1 2 3] size 3 == assert
 
-[2 3 4] expand 3 ==
+[2 3 4] expand 3 == assert
 3 depth == assert
 
 [1 2] [1 2] == assert
