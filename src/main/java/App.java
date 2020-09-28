@@ -1,6 +1,8 @@
-import net.sf.json.JSONObject;
-import org.apache.commons.lang.StringUtils;
+//import net.sf.json.JSONObject;
+//import org.apache.commons.lang.StringUtils;
 
+
+import java.io.Console;
 import java.io.File;
 import java.nio.file.Paths;
 import java.util.List;
@@ -20,6 +22,10 @@ public class App {
         log.info("fifth-sys v0.1");
         log.setVerbosity(0);
 
+        // How to read a line ffs?
+//        String text = System.console().readLine("λ ");
+//        log.info("You entered: " + text);
+
         int result;
         try {
             result = new App().run(argv);
@@ -38,10 +44,10 @@ public class App {
     }
 
     private void parseConfig(List<String> jsonText) {
-        String allText = StringUtils.join(jsonText, "");
-        JSONObject json = JSONObject.fromObject(allText);
-        tests = json.get("tests");
-        options = json.get("options");
+//        String allText = StringUtils.join(jsonText, "");
+//        JSONObject json = JSONObject.fromObject(allText);
+//        tests = json.get("tests");
+//        options = json.get("options");
     }
 
     private int run(String[] argv) {

@@ -5,6 +5,6 @@ if 2 == 1
     b = 2
 
 assert a == 1
-assert !exists(b)
+assert not exists(b)
 
 

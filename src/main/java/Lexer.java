@@ -2,10 +2,10 @@ import java.util.*;
 
 public class Lexer extends ProcessBase {
     private final List<Token> tokens = new ArrayList<>();
-    private static final Map<String, ETokenType> tokenNames = new HashMap<String, ETokenType>();
-    private List<String> lines;
-    private int lineNumber;
-    private int offset;
+    protected final Map<String, ETokenType> tokenNames = new HashMap<String, ETokenType>();
+    protected List<String> lines;
+    protected int lineNumber;
+    protected int offset;
 
     public Lexer(ILogger logger) {
         super(logger);
@@ -72,7 +72,7 @@ public class Lexer extends ProcessBase {
         tokenNames.put("showStack", ETokenType.ShowStack);
         tokenNames.put("size", ETokenType.Size);
         tokenNames.put("toArray", ETokenType.ToArray);
-        tokenNames.put("expand", ETokenType.FromArray);
+        tokenNames.put("expand", ETokenType.Expand);
         tokenNames.put("forEach", ETokenType.ForEach);
     }
 
@@ -97,11 +97,11 @@ public class Lexer extends ProcessBase {
         return Optional.of(line.substring(spliceOffset, spliceOffset + spliceLength));
     }
 
-    private boolean atEnd() {
+    protected boolean atEnd() {
         return atEnd(offset);
     }
 
-    private boolean atEnd(int offset) {
+    protected boolean atEnd(int offset) {
         if (lineNumber >= lines.size()) {
             return true;
         }
@@ -140,7 +140,7 @@ public class Lexer extends ProcessBase {
         return !hasFailed();
     }
 
-    private boolean parseLine(String line) {
+    protected boolean parseLine(String line) {
         if (line.isEmpty()) {
             addToken(ETokenType.Whitespace, 0);
             offset = 0;
@@ -348,7 +348,7 @@ public class Lexer extends ProcessBase {
         return line.charAt(offset + 1) == ch;
     }
 
-    private boolean addToken(ETokenType type, int len) {
+    protected boolean addToken(ETokenType type, int len) {
         return addToken(new Token(type, currentSplice(len), this));
     }
 
@@ -371,8 +371,6 @@ public class Lexer extends ProcessBase {
         return new StringSplice(lineNumber, offset, length);
     }
 
-    @org.jetbrains.annotations.NotNull
-    @org.jetbrains.annotations.Contract(value = " -> new", pure = true)
     private StringSplice currentSplice() {
         return new StringSplice(lineNumber, offset, 1);
     }

@@ -39,6 +39,10 @@ public enum ETokenType {
 
     If, IfElse, While, For,
 
-    Size, ToArray, FromArray, At, Set,
+    Size, ToArray, Expand, At, Set,
     ForEach,
+
+    // Rho Tokens
+    Fun,
+    Tab,
 }

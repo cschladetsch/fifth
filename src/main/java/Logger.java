@@ -73,7 +73,7 @@ public class Logger implements ILogger {
     }
 
     public void error(Object text) {
-        print(System.err, ELogLevel.Error, text);
+        print(System.out, ELogLevel.Error, text);
     }
 
     public void error(Exception e) {

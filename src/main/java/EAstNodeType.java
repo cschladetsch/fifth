@@ -6,5 +6,8 @@ public enum EAstNodeType {
     Continuation,
     Comment,
     Token,
+
+    // Rho
+    Fun,
 }
 

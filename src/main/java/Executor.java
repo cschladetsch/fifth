@@ -116,8 +116,8 @@ public class Executor extends ProcessBase {
                 return doSize();
             case ToArray:
                 return doToArray();
-            case FromArray:
-                return doFromArray();
+            case Expand:
+                return doExpand();
             case At:
                 return doAt();
             default:
@@ -133,7 +133,7 @@ public class Executor extends ProcessBase {
         return dataPush(array.get(index));
     }
 
-    private boolean doFromArray() {
+    private boolean doExpand() {
         List array = (List)(dataPop());
         for (Object item : array) {
             dataPush(item);
@@ -583,6 +583,26 @@ public class Executor extends ProcessBase {
         if (first instanceof Float || second instanceof Float) {
             return Math.abs((float) first - (float) second) > FLOAT_EPSILON;
         }
+
+        /* not needed?
+        if (first instanceof List) {
+            List left = (List)first;
+            if (second instanceof List) {
+                List right = (List)second;
+                if (left.size() != right.size()) {
+                    return false;
+                }
+
+                for (int n = 0; n < left.size(); ++n) {
+                    if (!doEquiv(left.get(n), right.get(n))) {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+        }
+        */
 
         return dataPush(first.equals(second));
     }
